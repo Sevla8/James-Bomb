@@ -13,6 +13,7 @@ class Labyrinth:
 		self.block = pygame.image.load(UNIT_BLOCK)
 		self.box = pygame.image.load(UNIT_BOX)
 		self.portal = pygame.image.load(UNIT_PORTAL)
+		self.bomb = pygame.image.load(BOMB).convert_alpha()
 		self.grid = [[Unit.GROUND] * Y_MAX for k in range(X_MAX)]
 		for j in range(Y_MIN, Y_MAX):
 			for i in range(X_MIN, X_MAX):
@@ -43,6 +44,12 @@ class Labyrinth:
 				return True
 		return False
 
+	def can_drop_bomb(self, position):
+		return True if self.grid[position.y][position.x] == Unit.GROUND else False
+
+	def drop_bomb(self, position):
+		self.grid[position.y][position.x] = Unit.BOMB
+
 	def print(self, window):
 		for j in range(Y_MIN, Y_MAX):
 			for i in range(X_MIN, X_MAX):
@@ -52,5 +59,8 @@ class Labyrinth:
 					window.blit(self.block, (i*SIZE_UNIT, j*SIZE_UNIT))
 				elif self.grid[j][i] == Unit.BOX:
 					window.blit(self.box, (i*SIZE_UNIT, j*SIZE_UNIT))
-				else:
+				elif self.grid[j][i] == Unit.PORTAL:
 					window.blit(self.portal, (i*SIZE_UNIT, j*SIZE_UNIT))
+				elif self.grid[j][i] == Unit.BOMB:
+					window.blit(self.ground, (i*SIZE_UNIT, j*SIZE_UNIT))
+					window.blit(self.bomb, (i*SIZE_UNIT, j*SIZE_UNIT))

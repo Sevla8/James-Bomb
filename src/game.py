@@ -37,6 +37,10 @@ while loop:
 				bomberman.change_position(Direction.DOWN)
 				if labyrinth.valid_move(bomberman.position, Direction.DOWN):
 					bomberman.move(Direction.DOWN)
+			elif event.key == pygame.K_SPACE:
+				if labyrinth.can_drop_bomb(bomberman.position) and bomberman.can_drop_bomb():
+					bomberman.drop_bomb()
+					labyrinth.drop_bomb(bomberman.position)
 		elif event.type == pygame.QUIT:
 			loop = False
 

@@ -8,3 +8,4 @@ class Unit(Enum):
 	BLOCK = 1
 	BOX = 2
 	PORTAL = 3
+	BOMB = 4

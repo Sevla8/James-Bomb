@@ -22,13 +22,12 @@ class Bomberman(Character):
 		self.bombs = Bomb()
 
 	def can_drop_bomb(self):
-		# à completer
-		pass
+		return True if self.bombs.bomb_amount - self.bombs.droped_bomb_amount > 0 else False
 
 	def drop_bomb(self):
-		self.bombs.droped_bombs += 1
-		# à completer
-		pass
+		self.bombs.droped_bomb_amount += 1
+		self.bombs.positions[self.bombs.bomb_amount - self.bombs.droped_bomb_amount].x = self.position.x
+		self.bombs.positions[self.bombs.bomb_amount - self.bombs.droped_bomb_amount].y = self.position.y
 
 	def print(self, window):
 		if self.direction == Direction.RIGHT:
