@@ -15,3 +15,5 @@ class Creep(Character):
 		self.back = pygame.image.load(BOMBERMAN_BACK).convert_alpha()
 		# self.position = Position(, );
 		# self.direction = Direction.DOWN
+		self.hp = DEFAULT_HP_CREEP
+		self.xp = DEFAULT_XP_CREEP

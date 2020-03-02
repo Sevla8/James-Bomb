@@ -7,6 +7,7 @@ from direction import *
 from unit import *
 from position import *
 from character import *
+from bomb import *
 
 class Bomberman(Character):
 	def __init__(self):
@@ -16,6 +17,18 @@ class Bomberman(Character):
 		self.back = pygame.image.load(BOMBERMAN_BACK).convert_alpha()
 		self.position = Position(BOMBERMAN_INITIAL_POSITION_X, BOMBERMAN_INITIAL_POSITION_Y);
 		self.direction = Direction.DOWN
+		self.hp = DEFAULT_HP_BOMBERMAN
+		self.xp = DEFAULT_XP_BOMBERMAN
+		self.bombs = Bomb()
+
+	def can_drop_bomb(self):
+		# à completer
+		pass
+
+	def drop_bomb(self):
+		self.bombs.droped_bombs += 1
+		# à completer
+		pass
 
 	def print(self, window):
 		if self.direction == Direction.RIGHT:

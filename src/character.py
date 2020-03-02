@@ -15,6 +15,8 @@ class Character:
 		self.back
 		self.position
 		self.direction
+		self.hp
+		self.xp
 
 	def move(self, direction):
 		if direction == Direction.RIGHT:
