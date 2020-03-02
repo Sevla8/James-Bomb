@@ -2,9 +2,9 @@
 Bomberman game 
 
 ## Dépendances 
-- Python (version 3+)
-- Pygame
-- Pygame-menu
+- python (version 3+)
+- pygame
+- pygameMenu
 
 ## Lancer le projet
 En ligne de commande : `python3 src/James-Bomb.py`
