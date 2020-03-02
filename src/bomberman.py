@@ -26,9 +26,7 @@ class Bomberman(Character):
 
 	def drop_bomb(self):
 		self.bombs.droped_bomb_amount += 1
-		self.bombs.positions[self.bombs.bomb_amount - self.bombs.droped_bomb_amount].x = self.position.x
-		self.bombs.positions[self.bombs.bomb_amount - self.bombs.droped_bomb_amount].y = self.position.y
-
+	
 	def print(self, window):
 		if self.direction == Direction.RIGHT:
 			window.blit(self.right, (self.position.x*SIZE_UNIT, (self.position.y-1)*SIZE_UNIT))

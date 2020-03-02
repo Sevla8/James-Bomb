@@ -10,4 +10,3 @@ class Bomb:
 		self.bomb_amount = DEFAULT_BOMB_AMOUNT
 		self.droped_bomb_amount = 0
 		self.scope = DEFAULT_BOMB_SCOPE
-		self.positions = [Position()] * MAX_BOMB_AMOUNT
