@@ -28,7 +28,7 @@ class Character:
 		if direction == Direction.DOWN:
 			self.position.y += 1
 
-	def change_position(self, direction):
+	def turn(self, direction):
 		if direction == Direction.RIGHT:
 			self.direction = Direction.RIGHT
 		if direction == Direction.LEFT:
@@ -40,10 +40,10 @@ class Character:
 
 	def print(self, window):
 		if self.direction == Direction.RIGHT:
-			window.blit(self.right, (self.position.x*SIZE_UNIT, self.position.y*SIZE_UNIT))
+			window.blit(pygame.transform.scale(self.right, (SIZE_UNIT, SIZE_UNIT)), (self.position.x*SIZE_UNIT, self.position.y*SIZE_UNIT))
 		elif self.direction == Direction.LEFT:
-			window.blit(self.left, (self.position.x*SIZE_UNIT, self.position.y*SIZE_UNIT))
+			window.blit(pygame.transform.scale(self.left, (SIZE_UNIT, SIZE_UNIT)), (self.position.x*SIZE_UNIT, self.position.y*SIZE_UNIT))
 		elif self.direction == Direction.UP:
-			window.blit(self.back, (self.position.x*SIZE_UNIT, self.position.y*SIZE_UNIT))
+			window.blit(pygame.transform.scale(self.back, (SIZE_UNIT, SIZE_UNIT)), (self.position.x*SIZE_UNIT, self.position.y*SIZE_UNIT))
 		else:
-			window.blit(self.front, (self.position.x*SIZE_UNIT, self.position.y*SIZE_UNIT))
+			window.blit(pygame.transform.scale(self.front, (SIZE_UNIT, SIZE_UNIT)), (self.position.x*SIZE_UNIT, self.position.y*SIZE_UNIT))

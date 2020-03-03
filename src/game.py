@@ -9,7 +9,7 @@ from direction import *
 
 pygame.init()
 
-window = pygame.display.set_mode(WINDOW_SIZE)
+window = pygame.display.set_mode(WINDOW_SIZE, pygame.RESIZABLE)
 pygame.display.set_caption(WINDOW_CAPTION)
 pygame.key.set_repeat(400, 30)
 
@@ -19,22 +19,23 @@ bomberman = Bomberman()
 
 loop = True
 while loop:
+
 	for event in pygame.event.get():
 		if event.type == pygame.KEYDOWN:
 			if event.key == pygame.K_RIGHT:
-				bomberman.change_position(Direction.RIGHT)
+				bomberman.turn(Direction.RIGHT)
 				if labyrinth.valid_move(bomberman.position, Direction.RIGHT):
 					bomberman.move(Direction.RIGHT)
 			elif event.key == pygame.K_LEFT:
-				bomberman.change_position(Direction.LEFT)
+				bomberman.turn(Direction.LEFT)
 				if labyrinth.valid_move(bomberman.position, Direction.LEFT):
 					bomberman.move(Direction.LEFT)
 			elif event.key == pygame.K_UP:
-				bomberman.change_position(Direction.UP)
+				bomberman.turn(Direction.UP)
 				if labyrinth.valid_move(bomberman.position, Direction.UP):
 					bomberman.move(Direction.UP)
 			elif event.key == pygame.K_DOWN:
-				bomberman.change_position(Direction.DOWN)
+				bomberman.turn(Direction.DOWN)
 				if labyrinth.valid_move(bomberman.position, Direction.DOWN):
 					bomberman.move(Direction.DOWN)
 			elif event.key == pygame.K_SPACE:

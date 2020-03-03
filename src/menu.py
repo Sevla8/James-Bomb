@@ -9,14 +9,11 @@ clock = None
 main_menu = None
 surface = None
 
-def ok():
-	pass
-
 def main_background():
 	global surface
 	surface.fill(COLOR_BACKGROUND)
 
-def mainMenu() :
+def main_menu() :
 	global clock
 	global main_menu
 	global surface

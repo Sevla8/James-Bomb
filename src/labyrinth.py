@@ -54,13 +54,13 @@ class Labyrinth:
 		for j in range(Y_MIN, Y_MAX):
 			for i in range(X_MIN, X_MAX):
 				if self.grid[j][i] == Unit.GROUND:
-					window.blit(self.ground, (i*SIZE_UNIT, j*SIZE_UNIT))
+					window.blit(pygame.transform.scale(self.ground, (SIZE_UNIT, SIZE_UNIT)), (i*SIZE_UNIT, j*SIZE_UNIT))
 				elif self.grid[j][i] == Unit.BLOCK:
-					window.blit(self.block, (i*SIZE_UNIT, j*SIZE_UNIT))
+					window.blit(pygame.transform.scale(self.block, (SIZE_UNIT, SIZE_UNIT)), (i*SIZE_UNIT, j*SIZE_UNIT))
 				elif self.grid[j][i] == Unit.BOX:
-					window.blit(self.box, (i*SIZE_UNIT, j*SIZE_UNIT))
+					window.blit(pygame.transform.scale(self.box, (SIZE_UNIT, SIZE_UNIT)), (i*SIZE_UNIT, j*SIZE_UNIT))
 				elif self.grid[j][i] == Unit.PORTAL:
-					window.blit(self.portal, (i*SIZE_UNIT, j*SIZE_UNIT))
+					window.blit(pygame.transform.scale(self.portal, (SIZE_UNIT, SIZE_UNIT)), (i*SIZE_UNIT, j*SIZE_UNIT))
 				elif self.grid[j][i] == Unit.BOMB:
-					window.blit(self.ground, (i*SIZE_UNIT, j*SIZE_UNIT))
-					window.blit(self.bomb, (i*SIZE_UNIT, j*SIZE_UNIT))
+					window.blit(pygame.transform.scale(self.ground, (SIZE_UNIT, SIZE_UNIT)), (i*SIZE_UNIT, j*SIZE_UNIT))
+					window.blit(pygame.transform.scale(self.bomb, (SIZE_UNIT, SIZE_UNIT)), (i*SIZE_UNIT, j*SIZE_UNIT))
