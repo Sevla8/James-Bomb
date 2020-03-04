@@ -1,7 +1,7 @@
 import pygame
 import sys
-import MenuP
+from menu import *
 
 pygame.init()
 
-MenuP.mainMenu()
+main_menu()
