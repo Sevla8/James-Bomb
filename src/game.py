@@ -17,6 +17,8 @@ labyrinth = Labyrinth()
 labyrinth.generate()
 bomberman = Bomberman()
 
+creeps = [Creep()]*3
+
 loop = True
 while loop:
 	for event in pygame.event.get():
