@@ -1,11 +1,11 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-import pygame
-from constants import *
 from labyrinth import *
+from constants import *
 from bomberman import *
 from direction import *
+import pygame
 
 pygame.init()
 
@@ -13,8 +13,10 @@ window = pygame.display.set_mode(WINDOW_SIZE, pygame.RESIZABLE)
 pygame.display.set_caption(WINDOW_CAPTION)
 pygame.key.set_repeat(400, 30)
 
+stage = 1
+
 labyrinth = Labyrinth()
-labyrinth.generate()
+labyrinth.load(stage)
 bomberman = Bomberman()
 
 loop = True
