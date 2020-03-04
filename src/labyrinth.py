@@ -50,7 +50,8 @@ class Labyrinth:
 			record = cursor.fetchone()[0]
 			cursor.close()
 
-			json_grid = record.decode("utf-8") # bizarrement 'record' est de type <byte>, on le decode donc
+			#json_grid = record.decode("utf-8") # bizarrement 'record' est de type <byte>, on le decode donc
+			json_grid = record
 
 			grid = json.loads(json_grid)
 
@@ -67,12 +68,9 @@ class Labyrinth:
 				db.close()
 
 	def generate(self):
-<<<<<<< HEAD
 		"""Générer les BOX"""
-=======
 		""" Génére un labyrinthe dont les composants seront disposés de manière aléatoire. Certains composants ont cependant une disposition prédéfinie et constante.
 		"""
->>>>>>> 10d05ece1b0e4ec8c103a830c202f3a210f97e39
 		for j in range(Y_MIN, Y_MAX):
 			for i in range(X_MIN, X_MAX):
 				if self.grid[j][i] != Unit.BLOCK:
@@ -81,7 +79,6 @@ class Labyrinth:
 					if (random.choice([True, True, False])):
 						self.grid[j][i] = Unit.BOX
 
-<<<<<<< HEAD
 		"""Générer les CREEPS"""
 		positions_occupees = []
 		for creep in self.creeps:
@@ -103,7 +100,6 @@ class Labyrinth:
 			creep.position = new_position
 
 		
-=======
 	def save(self):
 		""" Sauvegarde un labyrinthe. Pour le moment utilisé pour créer des labyrinthes dans la base de donnée. À terme servira à sauvegarder la progression du joueur.
 		"""
@@ -132,7 +128,6 @@ class Labyrinth:
 			if (db.is_connected()):
 				cursor.close()
 				db.close()
->>>>>>> 10d05ece1b0e4ec8c103a830c202f3a210f97e39
 
 	def valid_move(self, position, direction):
 		""" Retourne vrai si le mouvement caractérisé par 'position' et 'direction est valide. Retourne faux sinon.
@@ -200,15 +195,9 @@ class Labyrinth:
 				elif self.grid[j][i] == Unit.PORTAL:
 					window.blit(pygame.transform.scale(self.portal, (SIZE_UNIT, SIZE_UNIT)), (i*SIZE_UNIT, j*SIZE_UNIT))
 				elif self.grid[j][i] == Unit.BOMB:
-<<<<<<< HEAD
 					window.blit(self.ground, (i*SIZE_UNIT, j*SIZE_UNIT))
 					window.blit(self.bomb, (i*SIZE_UNIT, j*SIZE_UNIT))
 
 		"""On affiche les ennemies"""	
 		for i in range(NUMBER_CREEPS):
 			self.creeps[i].print(window)
-=======
-					window.blit(pygame.transform.scale(self.ground, (SIZE_UNIT, SIZE_UNIT)), (i*SIZE_UNIT, j*SIZE_UNIT))
-					window.blit(pygame.transform.scale(self.bomb, (SIZE_UNIT, SIZE_UNIT)), (i*SIZE_UNIT, j*SIZE_UNIT))
-		print(type(window))
->>>>>>> 10d05ece1b0e4ec8c103a830c202f3a210f97e39

@@ -16,6 +16,7 @@ pygame.key.set_repeat(400, 30)
 stage = 1
 
 labyrinth = Labyrinth()
+#labyrinth.generate()
 labyrinth.load(stage)
 bomberman = Bomberman()
 
