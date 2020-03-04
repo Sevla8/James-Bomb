@@ -8,4 +8,4 @@ Bomberman game
 - mysql.connector
 
 ## Lancer le projet
-En ligne de commande : `python3 src/James-Bomb.py`
+En ligne de commande : `python3 src/main.py`
