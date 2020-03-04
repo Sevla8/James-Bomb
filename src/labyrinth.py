@@ -10,9 +10,9 @@ from unit import *
 from direction import *
 
 class Labyrinth:
-	""" Construit un labyrinthe.
-	"""
 	def __init__(self):
+		""" Construit un labyrinthe.
+		"""
 		self.ground = pygame.image.load(UNIT_GROUND)
 		self.block = pygame.image.load(UNIT_BLOCK)
 		self.box = pygame.image.load(UNIT_BOX)
