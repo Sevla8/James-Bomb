@@ -24,6 +24,7 @@ class Character:
 		if direction == Direction.LEFT:
 			self.position.x -= 1
 		if direction == Direction.UP:
+			#move_animation(self,direction):
 			self.position.y -= 1
 		if direction == Direction.DOWN:
 			self.position.y += 1
@@ -37,6 +38,9 @@ class Character:
 			self.direction = Direction.UP
 		if direction == Direction.DOWN:
 			self.direction = Direction.DOWN
+
+	def move_animation(self,direction):
+		pass
 
 	def print(self, window):
 		if self.direction == Direction.RIGHT:

@@ -67,6 +67,29 @@ class Labyrinth:
 				cursor.close()
 				db.close()
 
+	"""Non généré par base de données encore"""
+	def generate_ennemies(self):
+		"""Générer les CREEPS"""
+		positions_occupees = []
+		for creep in self.creeps:
+			new_position = Position(0,0)
+			place_occupee = False
+
+			"""On test si la place est valide, non occupée et pas trop proche du joueur"""
+			while self.grid[new_position.y][new_position.x] != Unit.GROUND or new_position.y < BOMBERMAN_INITIAL_POSITION_Y + 5 and new_position.x < BOMBERMAN_INITIAL_POSITION_X + 5  or place_occupee:
+				place_occupee = False
+				new_position = Position(random.randint(X_MIN+1,X_MAX-2),random.randint(Y_MIN+1,Y_MAX-2))
+				"""On vérifie si la place est libre"""
+				for place in positions_occupees:
+					if ( new_position == place ):
+						place_occupee = True
+						break
+			
+			"""On sauvegarde la place comme étant occupée, et on l'attribut à un ennemie """
+			positions_occupees.append(new_position)
+			creep.position = new_position
+
+
 	def generate(self):
 		"""Générer les BOX"""
 		""" Génére un labyrinthe dont les composants seront disposés de manière aléatoire. Certains composants ont cependant une disposition prédéfinie et constante.
@@ -156,6 +179,29 @@ class Labyrinth:
 				return True
 		return False
 
+	def move_enemies(self):
+		#print("ok")
+		for creep in self.creeps:
+			for i in range(5):
+				next_move = random.choice([Direction.UP,Direction.LEFT,Direction.RIGHT,Direction.DOWN])
+				if ( next_move == Direction.UP and self.valid_move(creep.position, Direction.UP)):
+					creep.turn(Direction.UP)
+					creep.move(Direction.UP)
+					break
+				elif ( next_move == Direction.LEFT and self.valid_move(creep.position, Direction.LEFT)):
+					creep.turn(Direction.LEFT)
+					creep.move(Direction.LEFT)
+					break
+				elif ( next_move == Direction.RIGHT and self.valid_move(creep.position, Direction.RIGHT)):
+					creep.turn(Direction.RIGHT)
+					creep.move(Direction.RIGHT)
+					break
+				elif ( next_move == Direction.DOWN and self.valid_move(creep.position, Direction.DOWN)):
+					creep.turn(Direction.DOWN)
+					creep.move(Direction.DOWN)
+					break
+				
+
 	def can_drop_bomb(self, position):
 		""" Retourne vrai si une bombe peut être posée à l'emplacement caractérisé par 'position'. Retourne faux sinon.
 			Paramètres:
@@ -199,5 +245,5 @@ class Labyrinth:
 					window.blit(self.bomb, (i*SIZE_UNIT, j*SIZE_UNIT))
 
 		"""On affiche les ennemies"""	
-		for i in range(NUMBER_CREEPS):
-			self.creeps[i].print(window)
+		for creep in self.creeps:
+			creep.print(window)

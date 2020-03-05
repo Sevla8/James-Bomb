@@ -18,3 +18,8 @@ class Creep(Character):
 		self.direction = Direction.DOWN
 		self.hp = DEFAULT_HP_CREEP
 		self.xp = DEFAULT_XP_CREEP
+
+	#def move_animation(self,direction):
+	#	if (direction == direction.UP):
+	#		for i in range(6):
+	#			print("i=",i)

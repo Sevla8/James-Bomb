@@ -16,11 +16,16 @@ pygame.key.set_repeat(400, 30)
 stage = 1
 
 labyrinth = Labyrinth()
-#labyrinth.generate()
+"""labyrinth.generate()"""
 labyrinth.load(stage)
+
+"""A enlever quand les ennemies seront chargés par base de données aussi"""
+labyrinth.generate_ennemies()
 bomberman = Bomberman()
 
-creeps = [Creep()]*3
+"""Initialisation du timer"""
+timer = pygame.time.get_ticks()
+next_step = timer + LAPS
 
 loop = True
 while loop:
@@ -49,6 +54,14 @@ while loop:
 					labyrinth.drop_bomb(bomberman.position)
 		elif event.type == pygame.QUIT:
 			loop = False
+
+	timer = pygame.time.get_ticks()
+	if ( timer > next_step ):
+		#print("ok")
+		labyrinth.move_enemies()
+		next_step = timer + LAPS
+
+
 
 	labyrinth.print(window)
 	bomberman.print(window)
