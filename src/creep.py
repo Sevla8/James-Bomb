@@ -14,12 +14,7 @@ class Creep(Character):
 		self.left = pygame.image.load(CREEP_LEFT).convert_alpha()
 		self.front = pygame.image.load(CREEP_FRONT).convert_alpha()
 		self.back = pygame.image.load(CREEP_BACK).convert_alpha()
-		self.position = Position()
 		self.direction = Direction.DOWN
+		self.position = Position()
 		self.hp = DEFAULT_HP_CREEP
 		self.xp = DEFAULT_XP_CREEP
-
-	#def move_animation(self,direction):
-	#	if (direction == direction.UP):
-	#		for i in range(6):
-	#			print("i=",i)

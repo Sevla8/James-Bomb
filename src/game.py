@@ -16,20 +16,16 @@ pygame.key.set_repeat(400, 30)
 stage = 1
 
 labyrinth = Labyrinth()
-"""labyrinth.generate()"""
-labyrinth.load(stage)
-
-"""A enlever quand les ennemies seront chargés par base de données aussi"""
-labyrinth.generate_ennemies()
+labyrinth.generate()
+# labyrinth.load(stage)
 bomberman = Bomberman()
 
-"""Initialisation du timer"""
+# Initialisation du timer
 timer = pygame.time.get_ticks()
-next_step = timer + LAPS
+next_step = timer + SECOND
 
 loop = True
 while loop:
-
 	for event in pygame.event.get():
 		if event.type == pygame.KEYDOWN:
 			if event.key == pygame.K_RIGHT:
@@ -56,12 +52,9 @@ while loop:
 			loop = False
 
 	timer = pygame.time.get_ticks()
-	if ( timer > next_step ):
-		#print("ok")
-		labyrinth.move_enemies()
-		next_step = timer + LAPS
-
-
+	if (timer > next_step):
+		labyrinth.move_creeps()
+		next_step = timer + SECOND
 
 	labyrinth.print(window)
 	bomberman.print(window)

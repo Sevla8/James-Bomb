@@ -24,11 +24,8 @@ class Labyrinth:
 			for i in range(X_MIN, X_MAX):
 				if j == Y_MIN or j == Y_MAX-1 or i == X_MIN or i == X_MAX-1 or j % 2 == 0 and i % 2 == 0:
 					self.grid[j][i] = Unit.BLOCK
-		"""Si j'écris :
-		self.creeps = [Creep()]*NUMBER_CREEPS
-		Les objets créés pointeront dans la même zone mémoire, ce qui revient à 1 ennemie"""
 		self.creeps = []
-		for i in range(NUMBER_CREEPS):
+		for i in range(DEFAULT_CREEP_AMOUNT):
 			self.creeps.append(Creep())
 
 	def load(self, stage):
@@ -40,21 +37,18 @@ class Labyrinth:
 		"""
 		try:
 			db = mysql.connector.connect(host='localhost',
-												database='Bomberman',
-												user='root',
-												password='')
-
+										database='Bomberman',
+										user='root',
+										password='')
 			cursor = db.cursor()
 			query = "SELECT grid FROM Stages WHERE id_stage = %s"
 			cursor.execute(query, (stage,))
 			record = cursor.fetchone()[0]
 			cursor.close()
 
-			#json_grid = record.decode("utf-8") # bizarrement 'record' est de type <byte>, on le decode donc
 			json_grid = record
-
+			#json_grid = record.decode("utf-8")
 			grid = json.loads(json_grid)
-
 			for j in range(Y_MIN, Y_MAX):
 				for i in range(X_MIN, X_MAX):
 					self.grid[j][i] = Unit.GROUND if grid[j][i] == "ground" else Unit.BLOCK if grid[j][i] == "block" else Unit.BOX if grid[j][i] == "box" else Unit.PORTAL if grid[j][i] == "portal" else Unit.BOMB
@@ -67,28 +61,20 @@ class Labyrinth:
 				cursor.close()
 				db.close()
 
-	"""Non généré par base de données encore"""
-	def generate_ennemies(self):
-		"""Générer les CREEPS"""
-		positions_occupees = []
+	def generate_creeps(self):
 		for creep in self.creeps:
-			new_position = Position(0,0)
-			place_occupee = False
+			# On teste si la place est valide, non occupée et pas trop proche du joueur
+			attempt = Position(random.randint(BOMBERMAN_INITIAL_POSITION_X+5, X_MAX-1), random.randint(BOMBERMAN_INITIAL_POSITION_Y+5, Y_MAX-1))
+			while self.grid[attempt.y][attempt.x] != Unit.GROUND or self.invalid_creep_initial_position(attempt):
+				attempt = Position(random.randint(BOMBERMAN_INITIAL_POSITION_X+5, X_MAX-1), random.randint(BOMBERMAN_INITIAL_POSITION_Y+5, Y_MAX-1))
+			# On attribut la place au creep
+			creep.position = attempt
 
-			"""On test si la place est valide, non occupée et pas trop proche du joueur"""
-			while self.grid[new_position.y][new_position.x] != Unit.GROUND or new_position.y < BOMBERMAN_INITIAL_POSITION_Y + 5 and new_position.x < BOMBERMAN_INITIAL_POSITION_X + 5  or place_occupee:
-				place_occupee = False
-				new_position = Position(random.randint(X_MIN+1,X_MAX-2),random.randint(Y_MIN+1,Y_MAX-2))
-				"""On vérifie si la place est libre"""
-				for place in positions_occupees:
-					if ( new_position == place ):
-						place_occupee = True
-						break
-			
-			"""On sauvegarde la place comme étant occupée, et on l'attribut à un ennemie """
-			positions_occupees.append(new_position)
-			creep.position = new_position
-
+	def invalid_creep_initial_position(self, position):
+		for creep in self.creeps:
+			if creep.position.y == position.y and creep.position.x == position.x:
+				return True
+		return False
 
 	def generate(self):
 		"""Générer les BOX"""
@@ -101,28 +87,8 @@ class Labyrinth:
 						continue
 					if (random.choice([True, True, False])):
 						self.grid[j][i] = Unit.BOX
+		self.generate_creeps()
 
-		"""Générer les CREEPS"""
-		positions_occupees = []
-		for creep in self.creeps:
-			new_position = Position(0,0)
-			place_occupee = False
-
-			"""On test si la place est valide, non occupée et pas trop proche du joueur"""
-			while self.grid[new_position.y][new_position.x] != Unit.GROUND or new_position.y < BOMBERMAN_INITIAL_POSITION_Y + 5 and new_position.x < BOMBERMAN_INITIAL_POSITION_X + 5  or place_occupee:
-				place_occupee = False
-				new_position = Position(random.randint(X_MIN+1,X_MAX-2),random.randint(Y_MIN+1,Y_MAX-2))
-				"""On vérifie si la place est libre"""
-				for place in positions_occupees:
-					if ( new_position == place ):
-						place_occupee = True
-						break
-			
-			"""On sauvegarde la place comme étant occupée, et on l'attribut à un ennemie """
-			positions_occupees.append(new_position)
-			creep.position = new_position
-
-		
 	def save(self):
 		""" Sauvegarde un labyrinthe. Pour le moment utilisé pour créer des labyrinthes dans la base de donnée. À terme servira à sauvegarder la progression du joueur.
 		"""
@@ -134,9 +100,9 @@ class Labyrinth:
 
 		try:
 			db = mysql.connector.connect(host='localhost',
-												database='Bomberman',
-												user='root',
-												password='')
+										database='Bomberman',
+										user='root',
+										password='')
 
 			cursor = db.cursor()
 			query = "INSERT INTO Stages (id_stage, grid) VALUES (%s, %s)"
@@ -179,28 +145,42 @@ class Labyrinth:
 				return True
 		return False
 
-	def move_enemies(self):
-		#print("ok")
+	def creep_collision(self, position, direction):
 		for creep in self.creeps:
-			for i in range(5):
-				next_move = random.choice([Direction.UP,Direction.LEFT,Direction.RIGHT,Direction.DOWN])
-				if ( next_move == Direction.UP and self.valid_move(creep.position, Direction.UP)):
-					creep.turn(Direction.UP)
-					creep.move(Direction.UP)
-					break
-				elif ( next_move == Direction.LEFT and self.valid_move(creep.position, Direction.LEFT)):
-					creep.turn(Direction.LEFT)
-					creep.move(Direction.LEFT)
-					break
-				elif ( next_move == Direction.RIGHT and self.valid_move(creep.position, Direction.RIGHT)):
-					creep.turn(Direction.RIGHT)
-					creep.move(Direction.RIGHT)
-					break
-				elif ( next_move == Direction.DOWN and self.valid_move(creep.position, Direction.DOWN)):
-					creep.turn(Direction.DOWN)
-					creep.move(Direction.DOWN)
-					break
-				
+			if direction == Direction.RIGHT:
+				if creep.position.y == position.y and creep.position.x == position.x+1:
+					return True
+			if direction == Direction.LEFT:
+				if creep.position.y == position.y and creep.position.x == position.x-1:
+					return True
+			if direction == Direction.UP:
+				if creep.position.y-1 == position.y and creep.position.x == position.x:
+					return True
+			if direction == Direction.DOWN:
+				if creep.position.y+1 == position.y and creep.position.x == position.x:
+					return True
+		return False
+
+	def move_creeps(self):
+		for creep in self.creeps:
+			# si le creep peut continuer tout droit alors il continue tout droit
+			if self.valid_move(creep.position, creep.direction) and not self.creep_collision(creep.position, creep.direction):
+				creep.move(creep.direction)
+			# sinon on cherche une autre direction au hasard
+			else:
+				dead_end = False
+				if self.grid[creep.position.y+1][creep.position.x] != Unit.GROUND and self.grid[creep.position.y-1][creep.position.x] != Unit.GROUND and self.grid[creep.position.y][creep.position.x+1] != Unit.GROUND and self.grid[creep.position.y][creep.position.x-1] != Unit.GROUND:
+					dead_end = True
+				if not dead_end:
+					next_direction = random.choice([Direction.UP, Direction.LEFT, Direction.RIGHT, Direction.DOWN])
+					while not self.valid_move(creep.position, next_direction):
+						next_direction = random.choice([Direction.UP, Direction.LEFT, Direction.RIGHT, Direction.DOWN])
+					# si collision le creep ne fait que se tourner
+					if self.creep_collision(creep.position, next_direction):
+						creep.turn(next_direction)
+					else:
+						creep.turn(next_direction)
+						creep.move(next_direction)
 
 	def can_drop_bomb(self, position):
 		""" Retourne vrai si une bombe peut être posée à l'emplacement caractérisé par 'position'. Retourne faux sinon.
@@ -243,7 +223,5 @@ class Labyrinth:
 				elif self.grid[j][i] == Unit.BOMB:
 					window.blit(self.ground, (i*SIZE_UNIT, j*SIZE_UNIT))
 					window.blit(self.bomb, (i*SIZE_UNIT, j*SIZE_UNIT))
-
-		"""On affiche les ennemies"""	
 		for creep in self.creeps:
 			creep.print(window)
