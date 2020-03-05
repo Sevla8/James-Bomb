@@ -18,7 +18,7 @@ class Labyrinth:
 		self.block = pygame.image.load(UNIT_BLOCK)
 		self.box = pygame.image.load(UNIT_BOX)
 		self.portal = pygame.image.load(UNIT_PORTAL)
-		self.bomb = pygame.image.load(BOMB).convert_alpha()
+		self.bomb = [pygame.image.load(BOMB_1).convert_alpha(), pygame.image.load(BOMB_2).convert_alpha(), pygame.image.load(BOMB_3).convert_alpha()]
 		self.grid = [[Unit.GROUND] * Y_MAX for k in range(X_MAX)]
 		for j in range(Y_MIN, Y_MAX):
 			for i in range(X_MIN, X_MAX):
@@ -84,7 +84,7 @@ class Labyrinth:
 				if self.grid[j][i] != Unit.BLOCK:
 					if j == BOMBERMAN_INITIAL_POSITION_Y and i == BOMBERMAN_INITIAL_POSITION_X or j == BOMBERMAN_INITIAL_POSITION_Y+1 and i == BOMBERMAN_INITIAL_POSITION_X or j == BOMBERMAN_INITIAL_POSITION_Y and i == BOMBERMAN_INITIAL_POSITION_X+1:
 						continue
-					if (random.choice([True, True, False])):
+					if (random.choice([True, False])):
 						self.grid[j][i] = Unit.BOX
 		self.generate_creeps()
 
@@ -200,13 +200,16 @@ class Labyrinth:
 					<Position>
 					la position du personnage dans le labyrinthe
 		"""
-		self.grid[position.y][position.x] = Unit.BOMB
+		self.grid[position.y][position.x] = Unit.BOMB_1
 
 	def bomb_explose(self):
-		# incorrect car ne gere pas quelle bomb doit exploser
 		for j in range(Y_MIN, Y_MAX):
 			for i in range(X_MIN, X_MAX):
-				if self.grid[j][i] == Unit.BOMB:
+				if self.grid[j][i] == Unit.BOMB_1:
+					self.grid[j][i] = Unit.BOMB_2
+				elif self.grid[j][i] == Unit.BOMB_2:
+					self.grid[j][i] = Unit.BOMB_3
+				elif self.grid[j][i] == Unit.BOMB_3:
 					self.grid[j][i] = Unit.GROUND
 					if self.grid[j+1][i] == Unit.BOX:
 						self.grid[j+1][i] = Unit.GROUND
@@ -216,6 +219,10 @@ class Labyrinth:
 						self.grid[j][i+1] = Unit.GROUND
 					if self.grid[j][i-1] == Unit.BOX:
 						self.grid[j][i-1] = Unit.GROUND
+
+	def update_creeps_move_index(self):
+		for creep in self.creeps:
+			creep.update_move_index()
 
 	def print(self, window):
 		""" Affiche le labyrinthe dans la fenêtre caractérisé par 'window'.
@@ -234,8 +241,14 @@ class Labyrinth:
 					window.blit(pygame.transform.scale(self.box, (SIZE_UNIT, SIZE_UNIT)), (i*SIZE_UNIT, j*SIZE_UNIT))
 				elif self.grid[j][i] == Unit.PORTAL:
 					window.blit(pygame.transform.scale(self.portal, (SIZE_UNIT, SIZE_UNIT)), (i*SIZE_UNIT, j*SIZE_UNIT))
-				elif self.grid[j][i] == Unit.BOMB:
+				elif self.grid[j][i] == Unit.BOMB_1:
 					window.blit(self.ground, (i*SIZE_UNIT, j*SIZE_UNIT))
-					window.blit(self.bomb, (i*SIZE_UNIT, j*SIZE_UNIT))
+					window.blit(self.bomb[0], (i*SIZE_UNIT, j*SIZE_UNIT))
+				elif self.grid[j][i] == Unit.BOMB_2:
+					window.blit(self.ground, (i*SIZE_UNIT, j*SIZE_UNIT))
+					window.blit(self.bomb[1], (i*SIZE_UNIT, j*SIZE_UNIT))
+				elif self.grid[j][i] == Unit.BOMB_3:
+					window.blit(self.ground, (i*SIZE_UNIT, j*SIZE_UNIT))
+					window.blit(self.bomb[2], (i*SIZE_UNIT, j*SIZE_UNIT))
 		for creep in self.creeps:
 			creep.print(window)
