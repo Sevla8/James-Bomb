@@ -3,6 +3,7 @@ import os
 from random import randrange
 import pygame
 import pygameMenu
+import game
 from constants import *
 
 clock = None
@@ -13,7 +14,7 @@ def main_background():
 	global surface
 	surface.fill(COLOR_BACKGROUND)
 
-def main_menu() :
+def principal_menu() :
 	global clock
 	global main_menu
 	global surface
@@ -48,6 +49,7 @@ def main_menu() :
 										title_offsetx=50
 										)
 
+	adventure_option.add_option('Play', game.adventure)
 	adventure_option.add_option('Back', pygameMenu.events.BACK)
 
 	play_adventure_menu = pygameMenu.Menu(surface,

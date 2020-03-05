@@ -4,4 +4,4 @@ from menu import *
 
 pygame.init()
 
-main_menu()
+principal_menu()
