@@ -7,7 +7,7 @@ from direction import *
 from unit import *
 from position import *
 from character import *
-from bomb import *
+from skill import *
 
 class Bomberman(Character):
 	def __init__(self):
@@ -19,16 +19,16 @@ class Bomberman(Character):
 		self.direction = Direction.DOWN
 		self.hp = DEFAULT_HP_BOMBERMAN
 		self.xp = DEFAULT_XP_BOMBERMAN
-		self.bombs = Bomb()
+		self.skill = Skill()
 
 	def can_drop_bomb(self):
-		return True if self.bombs.bomb_amount - self.bombs.droped_bomb_amount > 0 else False
+		return True if self.skill.bomb_amount - self.skill.droped_bomb_amount > 0 else False
 
 	def drop_bomb(self):
-		self.bombs.droped_bomb_amount += 1
+		self.skill.droped_bomb_amount += 1
 
 	def bomb_explose(self):
-		self.bombs.droped_bomb_amount -= 1
+		self.skill.droped_bomb_amount -= 1
 
 	def print(self, window):
 		if self.direction == Direction.RIGHT:

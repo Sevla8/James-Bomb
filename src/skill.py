@@ -5,7 +5,7 @@ import pygame
 from constants import *
 from position import *
 
-class Bomb:
+class Skill:
 	def __init__(self):
 		self.bomb_amount = DEFAULT_BOMB_AMOUNT
 		self.droped_bomb_amount = 0
