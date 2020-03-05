@@ -27,6 +27,9 @@ class Bomberman(Character):
 	def drop_bomb(self):
 		self.bombs.droped_bomb_amount += 1
 
+	def bomb_explose(self):
+		self.bombs.droped_bomb_amount -= 1
+
 	def print(self, window):
 		if self.direction == Direction.RIGHT:
 			window.blit(pygame.transform.scale(self.right, (SIZE_UNIT, 2*SIZE_UNIT)), (self.position.x*SIZE_UNIT, (self.position.y-1)*SIZE_UNIT))

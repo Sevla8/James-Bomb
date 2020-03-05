@@ -20,14 +20,14 @@ labyrinth.generate()
 # labyrinth.load(stage)
 bomberman = Bomberman()
 
-# Initialisation du timer
-timer = pygame.time.get_ticks()
-next_step = timer + SECOND
+pygame.time.set_timer(pygame.USEREVENT + EVENT_ONE_SECOND, SECOND)
 
 loop = True
 while loop:
 	for event in pygame.event.get():
-		if event.type == pygame.KEYDOWN:
+		if event.type == pygame.QUIT:
+			loop = False
+		elif event.type == pygame.KEYDOWN:
 			if event.key == pygame.K_RIGHT:
 				bomberman.turn(Direction.RIGHT)
 				if labyrinth.valid_move(bomberman.position, Direction.RIGHT):
@@ -47,14 +47,14 @@ while loop:
 			elif event.key == pygame.K_SPACE:
 				if labyrinth.can_drop_bomb(bomberman.position) and bomberman.can_drop_bomb():
 					bomberman.drop_bomb()
+					pygame.time.set_timer(pygame.USEREVENT + EVENT_BOMB_EXPLOSE, 3*SECOND)
 					labyrinth.drop_bomb(bomberman.position)
-		elif event.type == pygame.QUIT:
-			loop = False
-
-	timer = pygame.time.get_ticks()
-	if (timer > next_step):
-		labyrinth.move_creeps()
-		next_step = timer + SECOND
+		elif event.type >= pygame.NOEVENT and event.type <= pygame.NUMEVENTS:
+			if event.type == pygame.USEREVENT + EVENT_ONE_SECOND:
+				labyrinth.move_creeps()
+			elif event.type == pygame.USEREVENT + EVENT_BOMB_EXPLOSE:
+				labyrinth.bomb_explose()
+				bomberman.bomb_explose()
 
 	labyrinth.print(window)
 	bomberman.print(window)

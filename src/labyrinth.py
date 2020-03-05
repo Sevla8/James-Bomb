@@ -77,7 +77,6 @@ class Labyrinth:
 		return False
 
 	def generate(self):
-		"""Générer les BOX"""
 		""" Génére un labyrinthe dont les composants seront disposés de manière aléatoire. Certains composants ont cependant une disposition prédéfinie et constante.
 		"""
 		for j in range(Y_MIN, Y_MAX):
@@ -202,6 +201,21 @@ class Labyrinth:
 					la position du personnage dans le labyrinthe
 		"""
 		self.grid[position.y][position.x] = Unit.BOMB
+
+	def bomb_explose(self):
+		# incorrect car ne gere pas quelle bomb doit exploser
+		for j in range(Y_MIN, Y_MAX):
+			for i in range(X_MIN, X_MAX):
+				if self.grid[j][i] == Unit.BOMB:
+					self.grid[j][i] = Unit.GROUND
+					if self.grid[j+1][i] == Unit.BOX:
+						self.grid[j+1][i] = Unit.GROUND
+					if self.grid[j-1][i] == Unit.BOX:
+						self.grid[j-1][i] = Unit.GROUND
+					if self.grid[j][i+1] == Unit.BOX:
+						self.grid[j][i+1] = Unit.GROUND
+					if self.grid[j][i-1] == Unit.BOX:
+						self.grid[j][i-1] = Unit.GROUND
 
 	def print(self, window):
 		""" Affiche le labyrinthe dans la fenêtre caractérisé par 'window'.
