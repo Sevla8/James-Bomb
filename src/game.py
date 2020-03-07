@@ -23,6 +23,7 @@ def adventure():
 
 	pygame.time.set_timer(pygame.USEREVENT + EVENT_ONE_SECOND, SECOND)
 	pygame.time.set_timer(pygame.USEREVENT + EVENT_ONE_HALF_SECOND, HALF_SECOND)
+	pygame.time.set_timer(pygame.USEREVENT + EVENT_ONE_TWENTIETH_SECOND, TWENTIETH_SECOND)
 
 	loop = True
 	while loop:
@@ -55,16 +56,20 @@ def adventure():
 				elif event.key == pygame.K_SPACE:
 					if labyrinth.can_drop_bomb(bomberman.position) and bomberman.can_drop_bomb():
 						bomberman.drop_bomb()
-						pygame.time.set_timer(pygame.USEREVENT + EVENT_BOMB_EXPLOSE, 3*HALF_SECOND)
 						labyrinth.drop_bomb(bomberman.position)
+						pygame.time.set_timer(pygame.USEREVENT + EVENT_BOMB_EXPLOSE, 3*HALF_SECOND)
 			elif event.type >= pygame.NOEVENT and event.type <= pygame.NUMEVENTS:
 				if event.type == pygame.USEREVENT + EVENT_ONE_SECOND:
 					labyrinth.move_creeps()
 					labyrinth.update_creeps_move_index()
 				if event.type == pygame.USEREVENT + EVENT_ONE_HALF_SECOND:
-					labyrinth.bomb_explose()
+					labyrinth.bomb_explose(bomberman)
+				if event.type == pygame.USEREVENT + EVENT_ONE_TWENTIETH_SECOND:
+					labyrinth.burning()
 				if event.type == pygame.USEREVENT + EVENT_BOMB_EXPLOSE:
 					bomberman.bomb_explose()
+				
+					
 
 		labyrinth.print(window)
 		bomberman.print(window)

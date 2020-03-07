@@ -19,6 +19,8 @@ class Labyrinth:
 		self.box = pygame.image.load(UNIT_BOX)
 		self.portal = pygame.image.load(UNIT_PORTAL)
 		self.bomb = [pygame.image.load(BOMB_1).convert_alpha(), pygame.image.load(BOMB_2).convert_alpha(), pygame.image.load(BOMB_3).convert_alpha()]
+		self.flame = [pygame.image.load(FLAME_0).convert_alpha(), pygame.image.load(FLAME_1).convert_alpha(), pygame.image.load(FLAME_2).convert_alpha(), pygame.image.load(FLAME_3).convert_alpha(), pygame.image.load(FLAME_4).convert_alpha()]
+		self.list_explosion = []
 		self.grid = [[Unit.GROUND] * Y_MAX for k in range(X_MAX)]
 		for j in range(Y_MIN, Y_MAX):
 			for i in range(X_MIN, X_MAX):
@@ -130,17 +132,18 @@ class Labyrinth:
 				<booléen>
 				vrai si mouvement valide, faux sinon
 		"""
+		#On peut marcher sur le sol, dans les flammes, sur le portal
 		if direction == Direction.RIGHT:
-			if self.grid[position.y][position.x+1] == Unit.GROUND:
+			if self.grid[position.y][position.x+1] >= Unit.GROUND or self.grid[position.y][position.x+1] == Unit.PORTAL :
 				return True
 		if direction == Direction.LEFT:
-			if self.grid[position.y][position.x-1] == Unit.GROUND:
+			if self.grid[position.y][position.x-1] >= Unit.GROUND or self.grid[position.y][position.x-1] == Unit.PORTAL :
 				return True
 		if direction == Direction.UP:
-			if self.grid[position.y-1][position.x] == Unit.GROUND:
+			if self.grid[position.y-1][position.x] >= Unit.GROUND or self.grid[position.y-1][position.x] == Unit.PORTAL :
 				return True
 		if direction == Direction.DOWN:
-			if self.grid[position.y+1][position.x] == Unit.GROUND:
+			if self.grid[position.y+1][position.x] >= Unit.GROUND or self.grid[position.y+1][position.x] == Unit.PORTAL :
 				return True
 		return False
 
@@ -202,7 +205,7 @@ class Labyrinth:
 		"""
 		self.grid[position.y][position.x] = Unit.BOMB_1
 
-	def bomb_explose(self):
+	def bomb_explose(self,bomberman):
 		for j in range(Y_MIN, Y_MAX):
 			for i in range(X_MIN, X_MAX):
 				if self.grid[j][i] == Unit.BOMB_1:
@@ -211,14 +214,46 @@ class Labyrinth:
 					self.grid[j][i] = Unit.BOMB_3
 				elif self.grid[j][i] == Unit.BOMB_3:
 					self.grid[j][i] = Unit.GROUND
-					if self.grid[j+1][i] == Unit.BOX:
-						self.grid[j+1][i] = Unit.GROUND
-					if self.grid[j-1][i] == Unit.BOX:
-						self.grid[j-1][i] = Unit.GROUND
-					if self.grid[j][i+1] == Unit.BOX:
-						self.grid[j][i+1] = Unit.GROUND
-					if self.grid[j][i-1] == Unit.BOX:
-						self.grid[j][i-1] = Unit.GROUND
+					self.explosion(i,j,bomberman)
+					
+
+	def explosion(self,x,y,bomberman):
+		#  "  and self.grid[j][x] >= Unit.BOX ):   "
+		#pas de block, portal ou autre bombe
+		j = y
+		while ( j < min(Y_MAX,y+bomberman.get_scope()+1) and self.grid[j][x] >= Unit.BOX ):
+			self.grid[j][x] = Unit.FLAME_0
+			j += 1
+
+		j = y
+		while ( j > max(Y_MIN,y-bomberman.get_scope()-1) and self.grid[j][x] >= Unit.BOX ):
+			self.grid[j][x] = Unit.FLAME_0
+			j -= 1
+
+		i = x
+		while ( i < min(X_MAX,x+bomberman.get_scope()+1) and self.grid[y][i] >= Unit.BOX ):
+			self.grid[y][i] = Unit.FLAME_0
+			i += 1
+
+		i = x
+		while ( i > max(X_MIN,x-bomberman.get_scope()-1) and self.grid[y][i] >= Unit.BOX ):
+			self.grid[y][i] = Unit.FLAME_0
+			i -= 1
+
+	def burning(self):
+		for j in range(Y_MIN, Y_MAX):
+			for i in range(X_MIN, X_MAX):
+				if self.grid[j][i] == Unit.FLAME_0:
+					self.grid[j][i] = Unit.FLAME_1
+				elif self.grid[j][i] == Unit.FLAME_1:
+					self.grid[j][i] = Unit.FLAME_2
+				elif self.grid[j][i] == Unit.FLAME_2:
+					self.grid[j][i] = Unit.FLAME_3
+				elif self.grid[j][i] == Unit.FLAME_3:
+					self.grid[j][i] = Unit.FLAME_4
+				elif self.grid[j][i] == Unit.FLAME_4:
+					self.grid[j][i] = Unit.GROUND
+
 
 	def update_creeps_move_index(self):
 		for creep in self.creeps:
@@ -250,5 +285,20 @@ class Labyrinth:
 				elif self.grid[j][i] == Unit.BOMB_3:
 					window.blit(pygame.transform.scale(self.ground, (SIZE_UNIT, SIZE_UNIT)), (i*SIZE_UNIT, j*SIZE_UNIT))
 					window.blit(pygame.transform.scale(self.bomb[2], (SIZE_UNIT, SIZE_UNIT)), (i*SIZE_UNIT, j*SIZE_UNIT))
+				elif self.grid[j][i] == Unit.FLAME_0:
+					window.blit(pygame.transform.scale(self.ground, (SIZE_UNIT, SIZE_UNIT)), (i*SIZE_UNIT, j*SIZE_UNIT))
+					window.blit(pygame.transform.scale(self.flame[0], (SIZE_UNIT, SIZE_UNIT)), (i*SIZE_UNIT, j*SIZE_UNIT))
+				elif self.grid[j][i] == Unit.FLAME_1:
+					window.blit(pygame.transform.scale(self.ground, (SIZE_UNIT, SIZE_UNIT)), (i*SIZE_UNIT, j*SIZE_UNIT))
+					window.blit(pygame.transform.scale(self.flame[1], (SIZE_UNIT, SIZE_UNIT)), (i*SIZE_UNIT, j*SIZE_UNIT))
+				elif self.grid[j][i] == Unit.FLAME_2:
+					window.blit(pygame.transform.scale(self.ground, (SIZE_UNIT, SIZE_UNIT)), (i*SIZE_UNIT, j*SIZE_UNIT))
+					window.blit(pygame.transform.scale(self.flame[2], (SIZE_UNIT, SIZE_UNIT)), (i*SIZE_UNIT, j*SIZE_UNIT))
+				elif self.grid[j][i] == Unit.FLAME_3:
+					window.blit(pygame.transform.scale(self.ground, (SIZE_UNIT, SIZE_UNIT)), (i*SIZE_UNIT, j*SIZE_UNIT))
+					window.blit(pygame.transform.scale(self.flame[3], (SIZE_UNIT, SIZE_UNIT)), (i*SIZE_UNIT, j*SIZE_UNIT))
+				elif self.grid[j][i] == Unit.FLAME_4:
+					window.blit(pygame.transform.scale(self.ground, (SIZE_UNIT, SIZE_UNIT)), (i*SIZE_UNIT, j*SIZE_UNIT))
+					window.blit(pygame.transform.scale(self.flame[4], (SIZE_UNIT, SIZE_UNIT)), (i*SIZE_UNIT, j*SIZE_UNIT))
 		for creep in self.creeps:
 			creep.print(window)
