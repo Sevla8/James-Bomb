@@ -26,8 +26,8 @@ class Unit(OrderedEnum):
 	BOMB_1 = 2
 	BOMB_2 = 3
 	BOMB_3 = 4
-	PORTAL = 5
-	BOX = 6
+	BOX = 5
+	PORTAL = 6
 	GROUND = 7
 	FLAME_0 = 8
 	FLAME_1 = 9

@@ -9,6 +9,8 @@ from position import *
 
 class Character:
 	def __init__(self):
+		""" Construit un personnage.
+		"""
 		self.right
 		self.left
 		self.front
@@ -21,6 +23,12 @@ class Character:
 		self.xp
 
 	def move(self, direction):
+		""" Fait se déplacer un personnage dans la direction caractérisé par 'position'.
+			Paramètres:
+				'direction':
+					<Direction>
+					la direction courante du personnage
+		"""
 		if direction == Direction.RIGHT:
 			self.position.x += 1
 		if direction == Direction.LEFT:
@@ -31,6 +39,8 @@ class Character:
 			self.position.y += 1
 
 	def turn(self, direction):
+		""" Fait tourner un personnage.
+		"""
 		if direction == Direction.RIGHT:
 			self.direction = Direction.RIGHT
 		if direction == Direction.LEFT:
@@ -45,13 +55,18 @@ class Character:
 		"""
 		self.move_index = (self.move_index + 1) % self.move_max
 
-
-	def print(self, window):
+	def print(self, window, size_unit):
+		""" Affiche le personnage dans la fenêtre caractérisé par 'window'.
+			Paramètres:
+				'window':
+					<pygame.Surface>
+					la fenetre courante
+		"""
 		if self.direction == Direction.RIGHT:
-			window.blit(pygame.transform.scale(self.right[self.move_index], (SIZE_UNIT, SIZE_UNIT)), (self.position.x*SIZE_UNIT, self.position.y*SIZE_UNIT))
+			window.blit(pygame.transform.scale(self.right[self.move_index], (size_unit, size_unit)), (self.position.x*size_unit, self.position.y*size_unit))
 		elif self.direction == Direction.LEFT:
-			window.blit(pygame.transform.scale(self.left[self.move_index], (SIZE_UNIT, SIZE_UNIT)), (self.position.x*SIZE_UNIT, self.position.y*SIZE_UNIT))
+			window.blit(pygame.transform.scale(self.left[self.move_index], (size_unit, size_unit)), (self.position.x*size_unit, self.position.y*size_unit))
 		elif self.direction == Direction.UP:
-			window.blit(pygame.transform.scale(self.back[self.move_index], (SIZE_UNIT, SIZE_UNIT)), (self.position.x*SIZE_UNIT, self.position.y*SIZE_UNIT))
+			window.blit(pygame.transform.scale(self.back[self.move_index], (size_unit, size_unit)), (self.position.x*size_unit, self.position.y*size_unit))
 		else:
-			window.blit(pygame.transform.scale(self.front[self.move_index], (SIZE_UNIT, SIZE_UNIT)), (self.position.x*SIZE_UNIT, self.position.y*SIZE_UNIT))
+			window.blit(pygame.transform.scale(self.front[self.move_index], (size_unit, size_unit)), (self.position.x*size_unit, self.position.y*size_unit))

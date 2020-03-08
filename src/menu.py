@@ -41,12 +41,12 @@ def principal_menu() :
 										menu_width=int(WINDOW_SIZE[0] * 0.7),
 										onclose=pygameMenu.events.DISABLE_CLOSE,
 										option_shadow=False,
-										title='Option	 d\'aventure',
+										title='Option d\'aventure',
 										window_height=WINDOW_SIZE[1],
 										window_width=WINDOW_SIZE[0],
 										mouse_enabled=True,
 										mouse_visible=True,
-										title_offsetx=50
+										# title_offsetx=50
 										)
 
 	adventure_option.add_option('Play', game.adventure)
@@ -71,7 +71,7 @@ def principal_menu() :
 											window_width=WINDOW_SIZE[0],
 											mouse_enabled=True,
 											mouse_visible=True,
-											title_offsetx=50
+											# title_offsetx=50
 											)
 
 	play_adventure_menu.add_option('1 Player', adventure_option)
@@ -92,15 +92,15 @@ def principal_menu() :
 								menu_height=int(WINDOW_SIZE[1] * 0.6),
 								menu_width=int(WINDOW_SIZE[0] * 0.6),
 								onclose=pygameMenu.events.DISABLE_CLOSE,
-								option_margin=25,
+								# option_margin=25,
 								option_shadow=False,
 								title='Menu Principal',
 								window_height=WINDOW_SIZE[1],
 								window_width=WINDOW_SIZE[0],
 								mouse_enabled=True,
 								mouse_visible=True,
-								title_offsetx=130,
-								title_offsety=-50
+								# title_offsetx=130,
+								# title_offsety=-50
 								)
 
 	main_menu.add_option('Play Local', play_adventure_menu)

@@ -11,6 +11,8 @@ from skill import *
 
 class Bomberman(Character):
 	def __init__(self):
+		""" Construit un Bomberman.
+		"""
 		self.right = [pygame.image.load(BOMBERMAN_RIGHT_0).convert_alpha(), pygame.image.load(BOMBERMAN_RIGHT_1).convert_alpha(), pygame.image.load(BOMBERMAN_RIGHT_2).convert_alpha(), pygame.image.load(BOMBERMAN_RIGHT_3).convert_alpha(), pygame.image.load(BOMBERMAN_RIGHT_4).convert_alpha(), pygame.image.load(BOMBERMAN_RIGHT_5).convert_alpha(), pygame.image.load(BOMBERMAN_RIGHT_6).convert_alpha(), pygame.image.load(BOMBERMAN_RIGHT_7).convert_alpha()]
 		self.left = [pygame.image.load(BOMBERMAN_LEFT_0).convert_alpha(), pygame.image.load(BOMBERMAN_LEFT_1).convert_alpha(), pygame.image.load(BOMBERMAN_LEFT_2).convert_alpha(), pygame.image.load(BOMBERMAN_LEFT_3).convert_alpha(), pygame.image.load(BOMBERMAN_LEFT_4).convert_alpha(), pygame.image.load(BOMBERMAN_LEFT_5).convert_alpha(), pygame.image.load(BOMBERMAN_LEFT_6).convert_alpha(), pygame.image.load(BOMBERMAN_LEFT_7).convert_alpha()]
 		self.front = [pygame.image.load(BOMBERMAN_FRONT_0).convert_alpha(), pygame.image.load(BOMBERMAN_FRONT_1).convert_alpha(), pygame.image.load(BOMBERMAN_FRONT_2).convert_alpha(), pygame.image.load(BOMBERMAN_FRONT_3).convert_alpha(), pygame.image.load(BOMBERMAN_FRONT_4).convert_alpha(), pygame.image.load(BOMBERMAN_FRONT_5).convert_alpha(), pygame.image.load(BOMBERMAN_FRONT_6).convert_alpha(), pygame.image.load(BOMBERMAN_FRONT_7).convert_alpha()]
@@ -24,23 +26,51 @@ class Bomberman(Character):
 		self.skill = Skill()
 
 	def can_drop_bomb(self):
+		""" Retourne vrai si le joueur peu poser une nombe. Retourne faux sinon.
+			Valeur de retour:
+				<booléen>
+				vrai si une bombe peut être posée, faux sinon
+		"""
 		return True if self.skill.bomb_amount - self.skill.droped_bomb_amount > 0 else False
 
 	def drop_bomb(self):
+		""" Augmente d'une unité le nombre de bombes posée par le joueur.
+		"""
 		self.skill.droped_bomb_amount += 1
 
 	def bomb_explose(self):
+		""" Diminue d'une unité le nombre de bombes posée par le joueur.
+		"""
 		self.skill.droped_bomb_amount -= 1
 
 	def get_scope(self):
+		""" Retourne la portée d'explosion des bombes du joueur.
+			Valeur de retour:
+				<nombre>
+				la portée d'explosion des bombes du joueur
+		"""
 		return self.skill.scope
 
-	def print(self, window):
+	def get_position(self):
+		""" Retourne la position du joueur.
+			Valeur de retour:
+				<nombre>
+				la position du joueur
+		"""
+		return self.position
+
+	def print(self, window, size_unit):
+		""" Affiche le bomberman dans la fenêtre caractérisé par 'window'.
+			Paramètres:
+				'window':
+					<pygame.Surface>
+					la fenetre courante
+		"""
 		if self.direction == Direction.RIGHT:
-			window.blit(pygame.transform.scale(self.right[self.move_index], (SIZE_UNIT, 2*SIZE_UNIT)), (self.position.x*SIZE_UNIT, (self.position.y-1)*SIZE_UNIT))
+			window.blit(pygame.transform.scale(self.right[self.move_index], (size_unit, 2*size_unit)), (self.position.x*size_unit, (self.position.y-1)*size_unit))
 		elif self.direction == Direction.LEFT:
-			window.blit(pygame.transform.scale(self.left[self.move_index], (SIZE_UNIT, 2*SIZE_UNIT)), (self.position.x*SIZE_UNIT, (self.position.y-1)*SIZE_UNIT))
+			window.blit(pygame.transform.scale(self.left[self.move_index], (size_unit, 2*size_unit)), (self.position.x*size_unit, (self.position.y-1)*size_unit))
 		elif self.direction == Direction.UP:
-			window.blit(pygame.transform.scale(self.back[self.move_index], (SIZE_UNIT, 2*SIZE_UNIT)), (self.position.x*SIZE_UNIT, (self.position.y-1)*SIZE_UNIT))
+			window.blit(pygame.transform.scale(self.back[self.move_index], (size_unit, 2*size_unit)), (self.position.x*size_unit, (self.position.y-1)*size_unit))
 		else:
-			window.blit(pygame.transform.scale(self.front[self.move_index], (SIZE_UNIT, 2*SIZE_UNIT)), (self.position.x*SIZE_UNIT, (self.position.y-1)*SIZE_UNIT))
+			window.blit(pygame.transform.scale(self.front[self.move_index], (size_unit, 2*size_unit)), (self.position.x*size_unit, (self.position.y-1)*size_unit))

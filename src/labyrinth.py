@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-import mysql.connector # il semble que ce module doit etre importé en premier sinon risque de boucle infinie
+# import mysql.connector # il semble que ce module doit etre importé en premier sinon risque de boucle infinie
 import random
 import json
 import pygame
@@ -20,7 +20,6 @@ class Labyrinth:
 		self.portal = pygame.image.load(UNIT_PORTAL)
 		self.bomb = [pygame.image.load(BOMB_1).convert_alpha(), pygame.image.load(BOMB_2).convert_alpha(), pygame.image.load(BOMB_3).convert_alpha()]
 		self.flame = [pygame.image.load(FLAME_0).convert_alpha(), pygame.image.load(FLAME_1).convert_alpha(), pygame.image.load(FLAME_2).convert_alpha(), pygame.image.load(FLAME_3).convert_alpha(), pygame.image.load(FLAME_4).convert_alpha()]
-		self.list_explosion = []
 		self.grid = [[Unit.GROUND] * Y_MAX for k in range(X_MAX)]
 		for j in range(Y_MIN, Y_MAX):
 			for i in range(X_MIN, X_MAX):
@@ -29,6 +28,7 @@ class Labyrinth:
 		self.creeps = []
 		for i in range(DEFAULT_CREEP_AMOUNT):
 			self.creeps.append(Creep())
+		self.portal_visible = False
 
 	def load(self, stage):
 		""" Charger un labyrinthe en fonction de l'avancement dans le jeu (caractérisé par 'stage').
@@ -64,6 +64,8 @@ class Labyrinth:
 				db.close()
 
 	def generate_creeps(self):
+		""" Génère de manière aléatoire des creeps sur le labyrinthe.
+		"""
 		for creep in self.creeps:
 			# On teste si la place est valide, non occupée et pas trop proche du joueur
 			attempt = Position(random.randint(BOMBERMAN_INITIAL_POSITION_X+5, X_MAX-1), random.randint(BOMBERMAN_INITIAL_POSITION_Y+5, Y_MAX-1))
@@ -73,6 +75,15 @@ class Labyrinth:
 			creep.position = attempt
 
 	def invalid_creep_initial_position(self, position):
+		""" Retourne vrai si un creep ne peu être positionné à la position caractérisée par 'position'.
+			Paramètres:
+				'position':
+					<Position>
+					la possible position du creep considéré dans le labyrinthe
+			Valeur de retour:
+				<booléen>
+				vrai si la position est valide, faux sinon
+		"""
 		for creep in self.creeps:
 			if creep.position.y == position.y and creep.position.x == position.x:
 				return True
@@ -88,6 +99,13 @@ class Labyrinth:
 						continue
 					if (random.choice([True, False])):
 						self.grid[j][i] = Unit.BOX
+		portal_ok = False
+		while not portal_ok:
+			y = random.randint(Y_MIN, Y_MAX-1)
+			x = random.randint(X_MIN, X_MAX-1)
+			if self.grid[y][x] == Unit.BOX:
+				self.grid[y][x] = Unit.PORTAL
+				portal_ok = True
 		self.generate_creeps()
 
 	def save(self):
@@ -120,7 +138,7 @@ class Labyrinth:
 				db.close()
 
 	def valid_move(self, position, direction):
-		""" Retourne vrai si le mouvement caractérisé par 'position' et 'direction est valide. Retourne faux sinon.
+		""" Retourne vrai si le mouvement caractérisé par 'position' et 'direction' est valide. Retourne faux sinon.
 			Paramètres:
 				'position':
 					<Position>
@@ -132,38 +150,60 @@ class Labyrinth:
 				<booléen>
 				vrai si mouvement valide, faux sinon
 		"""
-		#On peut marcher sur le sol, dans les flammes, sur le portal
+		# On peut marcher sur le sol, dans les flammes, sur le portal lorsqu'il est visible
 		if direction == Direction.RIGHT:
-			if self.grid[position.y][position.x+1] >= Unit.GROUND or self.grid[position.y][position.x+1] == Unit.PORTAL :
+			if self.grid[position.y][position.x+1] >= Unit.PORTAL:
+				if self.grid[position.y][position.x+1] == Unit.PORTAL and not self.portal_visible:
+					return False
 				return True
 		if direction == Direction.LEFT:
-			if self.grid[position.y][position.x-1] >= Unit.GROUND or self.grid[position.y][position.x-1] == Unit.PORTAL :
+			if self.grid[position.y][position.x-1] >= Unit.PORTAL:
+				if self.grid[position.y][position.x-1] == Unit.PORTAL and not self.portal_visible:
+					return False
 				return True
 		if direction == Direction.UP:
-			if self.grid[position.y-1][position.x] >= Unit.GROUND or self.grid[position.y-1][position.x] == Unit.PORTAL :
+			if self.grid[position.y-1][position.x] >= Unit.PORTAL:
+				if self.grid[position.y-1][position.x] == Unit.PORTAL and not self.portal_visible:
+					return False
 				return True
 		if direction == Direction.DOWN:
-			if self.grid[position.y+1][position.x] >= Unit.GROUND or self.grid[position.y+1][position.x] == Unit.PORTAL :
+			if self.grid[position.y+1][position.x] >= Unit.PORTAL:
+				if self.grid[position.y+1][position.x] == Unit.PORTAL and not self.portal_visible:
+					return False
 				return True
 		return False
 
 	def creep_collision(self, position, direction):
+		""" Retourne vrai si un creep caractérisé par 'position' et 'direction' peut rentrer en collision avec un autre.
+			Paramètres:
+				'position':
+					<Position>
+					la position du creep dans le labyrinthe
+				'direction':
+					<Direction>
+					la direction courante du creep
+			Valeur de retour:
+				<booléen>
+				vrai si collision possible, faux sinon
+		"""
 		for creep in self.creeps:
 			if direction == Direction.RIGHT:
-				if creep.position.y == position.y and creep.position.x == position.x+1:
+				if position.y == creep.position.y and position.x+1 == creep.position.x:
 					return True
 			if direction == Direction.LEFT:
-				if creep.position.y == position.y and creep.position.x == position.x-1:
+				if position.y == creep.position.y and position.x-1 == creep.position.x:
 					return True
 			if direction == Direction.UP:
-				if creep.position.y-1 == position.y and creep.position.x == position.x:
+				if position.y-1 == creep.position.y and position.x == creep.position.x:
 					return True
 			if direction == Direction.DOWN:
-				if creep.position.y+1 == position.y and creep.position.x == position.x:
+				if position.y+1 == creep.position.y and position.x == creep.position.x:
 					return True
 		return False
 
 	def move_creeps(self):
+		""" Fait déplacer les creeps au seins du labyrinthe.
+		"""
 		for creep in self.creeps:
 			# si le creep peut continuer tout droit alors il continue tout droit
 			if self.valid_move(creep.position, creep.direction) and not self.creep_collision(creep.position, creep.direction):
@@ -205,7 +245,20 @@ class Labyrinth:
 		"""
 		self.grid[position.y][position.x] = Unit.BOMB_1
 
-	def bomb_explose(self,bomberman):
+	def bomb_explose(self, position, scope):
+		""" Fait exploser les bombes sur le labyrinthe avec une porté caractérisé par 'scope'.
+			Retourne vrai si le bomberman caractérisé par 'position' est touché. Retourne faux sinon.
+			Paramètres:
+				'position':
+					<Position>
+					la position du bomberman dans le labyrinthe
+				'scope':
+					<nombre>
+					la portée des bombes du bomberman
+			Valeur de retour:
+				<booléen>
+				vrai si bomberman touché, faux sinon
+		"""
 		for j in range(Y_MIN, Y_MAX):
 			for i in range(X_MIN, X_MAX):
 				if self.grid[j][i] == Unit.BOMB_1:
@@ -213,56 +266,73 @@ class Labyrinth:
 				elif self.grid[j][i] == Unit.BOMB_2:
 					self.grid[j][i] = Unit.BOMB_3
 				elif self.grid[j][i] == Unit.BOMB_3:
-					self.grid[j][i] = Unit.GROUND
-					self.explosion(i,j,bomberman)
-					
-
-	def explosion(self,x,y,bomberman):
-		#  "  and self.grid[j][x] >= Unit.BOX ):   "
-		#pas de block, portal ou autre bombe
-		j = y
-		no_box_destroy = True
-		while ( j < min(Y_MAX,y+bomberman.get_scope()+1) and self.grid[j][x] >= Unit.BOX and no_box_destroy ):
-			if ( self.grid[j][x] == Unit.BOX ):
-				no_box_destroy = False
-			self.grid[j][x] = Unit.FLAME_0
-			j += 1
-
-		j = y
-		no_box_destroy = True
-		while ( j > max(Y_MIN,y-bomberman.get_scope()-1) and self.grid[j][x] >= Unit.BOX and no_box_destroy ):
-			if ( self.grid[j][x] == Unit.BOX ):
-				no_box_destroy = False
-			self.grid[j][x] = Unit.FLAME_0
-			j -= 1
-
-		i = x
-		no_box_destroy = True
-		while ( i < min(X_MAX,x+bomberman.get_scope()+1) and self.grid[y][i] >= Unit.BOX and no_box_destroy ):
-			if ( self.grid[y][i] == Unit.BOX ):
-				no_box_destroy = False
-			self.grid[y][i] = Unit.FLAME_0
-			i += 1
-
-		i = x
-		no_box_destroy = True
-		while ( i > max(X_MIN,x-bomberman.get_scope()-1) and self.grid[y][i] >= Unit.BOX and no_box_destroy ):
-			if ( self.grid[y][i] == Unit.BOX ):
-				no_box_destroy = False
-			self.grid[y][i] = Unit.FLAME_0
-			i -= 1
-
-
+					self.grid[j][i] = Unit.FLAME_0
+					for k in range(j, max(Y_MIN, j-scope-1), -1):
+						if self.grid[k][i] == Unit.GROUND:
+							self.grid[k][i] = Unit.FLAME_0
+						if self.grid[k][i] == Unit.PORTAL:
+							self.portal_visible = True
+							break
+						if self.grid[k][i] == Unit.BOX:
+							self.grid[k][i] = Unit.GROUND
+							break
+						if self.grid[k][i] == Unit.BLOCK:
+							break
+					for k in range(j, min(Y_MAX, j+scope+1), 1):
+						if self.grid[k][i] == Unit.GROUND:
+							self.grid[k][i] = Unit.FLAME_0
+						if self.grid[k][i] == Unit.PORTAL:
+							self.portal_visible = True
+							break
+						if self.grid[k][i] == Unit.BOX:
+							self.grid[k][i] = Unit.GROUND
+							break
+						if self.grid[k][i] == Unit.BLOCK:
+							break
+					for k in range(i, max(X_MIN, i-scope-1), -1):
+						if self.grid[j][k] == Unit.GROUND:
+							self.grid[j][k] = Unit.FLAME_0
+						if self.grid[j][k] == Unit.PORTAL:
+							self.portal_visible = True
+							break
+						if self.grid[j][k] == Unit.BOX:
+							self.grid[j][k] = Unit.GROUND
+							break
+						if self.grid[j][k] == Unit.BLOCK:
+							break
+					for k in range(i, min(X_MAX, i+scope+1), 1):
+						if self.grid[j][k] == Unit.GROUND:
+							self.grid[j][k] = Unit.FLAME_0
+						if self.grid[j][k] == Unit.PORTAL:
+							self.portal_visible = True
+							break
+						if self.grid[j][k] == Unit.BOX:
+							self.grid[j][k] = Unit.GROUND
+							break
+						if self.grid[j][k] == Unit.BLOCK:
+							break
 		for creep in self.creeps:
 			if (self.grid[creep.position.y][creep.position.x] >= Unit.FLAME_0 and self.grid[creep.position.y][creep.position.x] <= Unit.FLAME_4):
 				self.creeps.remove(creep)
+		return self.bomberman_touched(position)
 
-		#Bomberman touché
-		if (self.grid[bomberman.position.y][bomberman.position.x] >= Unit.FLAME_0 and self.grid[bomberman.position.y][bomberman.position.x] <= Unit.FLAME_4):
-			bomberman.position.y = Y_MIN + 1
-			bomberman.position.x = X_MIN + 1
+	def bomberman_touched(self, position):
+		""" Retourne vrai si le bomberman caractérisé par 'position' est touché. Retourne faux sinon.
+			Paramètres:
+				'position':
+					<Position>
+					la position du bomberman dans le labyrinthe
+			Valeur de retour:
+				<booléen>
+				vrai si bomberman touché, faux sinon
+		"""
+		if (self.grid[position.y][position.x] >= Unit.FLAME_0 and self.grid[position.y][position.x] <= Unit.FLAME_4):
+			return True
+		return False
 
-	def burning(self):
+	def burn(self):
+		""" Fait bruler les flammes sur le labyrinthe.
+		"""
 		for j in range(Y_MIN, Y_MAX):
 			for i in range(X_MIN, X_MAX):
 				if self.grid[j][i] == Unit.FLAME_0:
@@ -276,12 +346,16 @@ class Labyrinth:
 				elif self.grid[j][i] == Unit.FLAME_4:
 					self.grid[j][i] = Unit.GROUND
 
-
 	def update_creeps_move_index(self):
+		""" Met à jour la valeur de l'attribut 'move_index' dand le but de donner aux creeps une impression de marche lors de leurs déplacements.
+		"""
 		for creep in self.creeps:
 			creep.update_move_index()
 
-	def print(self, window):
+	def bomberman_on_portal(self, position):
+		return self.grid[position.y][position.x] == Unit.PORTAL
+
+	def print(self, window, size_unit):
 		""" Affiche le labyrinthe dans la fenêtre caractérisé par 'window'.
 			Paramètres:
 				'window':
@@ -291,36 +365,39 @@ class Labyrinth:
 		for j in range(Y_MIN, Y_MAX):
 			for i in range(X_MIN, X_MAX):
 				if self.grid[j][i] == Unit.GROUND:
-					window.blit(pygame.transform.scale(self.ground, (SIZE_UNIT, SIZE_UNIT)), (i*SIZE_UNIT, j*SIZE_UNIT))
+					window.blit(pygame.transform.scale(self.ground, (size_unit, size_unit)), (i*size_unit, j*size_unit))
 				elif self.grid[j][i] == Unit.BLOCK:
-					window.blit(pygame.transform.scale(self.block, (SIZE_UNIT, SIZE_UNIT)), (i*SIZE_UNIT, j*SIZE_UNIT))
+					window.blit(pygame.transform.scale(self.block, (size_unit, size_unit)), (i*size_unit, j*size_unit))
 				elif self.grid[j][i] == Unit.BOX:
-					window.blit(pygame.transform.scale(self.box, (SIZE_UNIT, SIZE_UNIT)), (i*SIZE_UNIT, j*SIZE_UNIT))
+					window.blit(pygame.transform.scale(self.box, (size_unit, size_unit)), (i*size_unit, j*size_unit))
 				elif self.grid[j][i] == Unit.PORTAL:
-					window.blit(pygame.transform.scale(self.portal, (SIZE_UNIT, SIZE_UNIT)), (i*SIZE_UNIT, j*SIZE_UNIT))
+					if self.portal_visible:
+						window.blit(pygame.transform.scale(self.portal, (size_unit, size_unit)), (i*size_unit, j*size_unit))
+					else:
+						window.blit(pygame.transform.scale(self.box, (size_unit, size_unit)), (i*size_unit, j*size_unit))
 				elif self.grid[j][i] == Unit.BOMB_1:
-					window.blit(pygame.transform.scale(self.ground, (SIZE_UNIT, SIZE_UNIT)), (i*SIZE_UNIT, j*SIZE_UNIT))
-					window.blit(pygame.transform.scale(self.bomb[0], (SIZE_UNIT, SIZE_UNIT)), (i*SIZE_UNIT, j*SIZE_UNIT))
+					window.blit(pygame.transform.scale(self.ground, (size_unit, size_unit)), (i*size_unit, j*size_unit))
+					window.blit(pygame.transform.scale(self.bomb[0], (size_unit, size_unit)), (i*size_unit, j*size_unit))
 				elif self.grid[j][i] == Unit.BOMB_2:
-					window.blit(pygame.transform.scale(self.ground, (SIZE_UNIT, SIZE_UNIT)), (i*SIZE_UNIT, j*SIZE_UNIT))
-					window.blit(pygame.transform.scale(self.bomb[1], (SIZE_UNIT, SIZE_UNIT)), (i*SIZE_UNIT, j*SIZE_UNIT))
+					window.blit(pygame.transform.scale(self.ground, (size_unit, size_unit)), (i*size_unit, j*size_unit))
+					window.blit(pygame.transform.scale(self.bomb[1], (size_unit, size_unit)), (i*size_unit, j*size_unit))
 				elif self.grid[j][i] == Unit.BOMB_3:
-					window.blit(pygame.transform.scale(self.ground, (SIZE_UNIT, SIZE_UNIT)), (i*SIZE_UNIT, j*SIZE_UNIT))
-					window.blit(pygame.transform.scale(self.bomb[2], (SIZE_UNIT, SIZE_UNIT)), (i*SIZE_UNIT, j*SIZE_UNIT))
+					window.blit(pygame.transform.scale(self.ground, (size_unit, size_unit)), (i*size_unit, j*size_unit))
+					window.blit(pygame.transform.scale(self.bomb[2], (size_unit, size_unit)), (i*size_unit, j*size_unit))
 				elif self.grid[j][i] == Unit.FLAME_0:
-					window.blit(pygame.transform.scale(self.ground, (SIZE_UNIT, SIZE_UNIT)), (i*SIZE_UNIT, j*SIZE_UNIT))
-					window.blit(pygame.transform.scale(self.flame[0], (SIZE_UNIT, SIZE_UNIT)), (i*SIZE_UNIT, j*SIZE_UNIT))
+					window.blit(pygame.transform.scale(self.ground, (size_unit, size_unit)), (i*size_unit, j*size_unit))
+					window.blit(pygame.transform.scale(self.flame[0], (size_unit, size_unit)), (i*size_unit, j*size_unit))
 				elif self.grid[j][i] == Unit.FLAME_1:
-					window.blit(pygame.transform.scale(self.ground, (SIZE_UNIT, SIZE_UNIT)), (i*SIZE_UNIT, j*SIZE_UNIT))
-					window.blit(pygame.transform.scale(self.flame[1], (SIZE_UNIT, SIZE_UNIT)), (i*SIZE_UNIT, j*SIZE_UNIT))
+					window.blit(pygame.transform.scale(self.ground, (size_unit, size_unit)), (i*size_unit, j*size_unit))
+					window.blit(pygame.transform.scale(self.flame[1], (size_unit, size_unit)), (i*size_unit, j*size_unit))
 				elif self.grid[j][i] == Unit.FLAME_2:
-					window.blit(pygame.transform.scale(self.ground, (SIZE_UNIT, SIZE_UNIT)), (i*SIZE_UNIT, j*SIZE_UNIT))
-					window.blit(pygame.transform.scale(self.flame[2], (SIZE_UNIT, SIZE_UNIT)), (i*SIZE_UNIT, j*SIZE_UNIT))
+					window.blit(pygame.transform.scale(self.ground, (size_unit, size_unit)), (i*size_unit, j*size_unit))
+					window.blit(pygame.transform.scale(self.flame[2], (size_unit, size_unit)), (i*size_unit, j*size_unit))
 				elif self.grid[j][i] == Unit.FLAME_3:
-					window.blit(pygame.transform.scale(self.ground, (SIZE_UNIT, SIZE_UNIT)), (i*SIZE_UNIT, j*SIZE_UNIT))
-					window.blit(pygame.transform.scale(self.flame[3], (SIZE_UNIT, SIZE_UNIT)), (i*SIZE_UNIT, j*SIZE_UNIT))
+					window.blit(pygame.transform.scale(self.ground, (size_unit, size_unit)), (i*size_unit, j*size_unit))
+					window.blit(pygame.transform.scale(self.flame[3], (size_unit, size_unit)), (i*size_unit, j*size_unit))
 				elif self.grid[j][i] == Unit.FLAME_4:
-					window.blit(pygame.transform.scale(self.ground, (SIZE_UNIT, SIZE_UNIT)), (i*SIZE_UNIT, j*SIZE_UNIT))
-					window.blit(pygame.transform.scale(self.flame[4], (SIZE_UNIT, SIZE_UNIT)), (i*SIZE_UNIT, j*SIZE_UNIT))
+					window.blit(pygame.transform.scale(self.ground, (size_unit, size_unit)), (i*size_unit, j*size_unit))
+					window.blit(pygame.transform.scale(self.flame[4], (size_unit, size_unit)), (i*size_unit, j*size_unit))
 		for creep in self.creeps:
-			creep.print(window)
+			creep.print(window, size_unit)
