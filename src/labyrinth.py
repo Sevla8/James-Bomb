@@ -221,22 +221,34 @@ class Labyrinth:
 		#  "  and self.grid[j][x] >= Unit.BOX ):   "
 		#pas de block, portal ou autre bombe
 		j = y
-		while ( j < min(Y_MAX,y+bomberman.get_scope()+1) and self.grid[j][x] >= Unit.BOX ):
+		no_box_destroy = True
+		while ( j < min(Y_MAX,y+bomberman.get_scope()+1) and self.grid[j][x] >= Unit.BOX and no_box_destroy ):
+			if ( self.grid[j][x] == Unit.BOX ):
+				no_box_destroy = False
 			self.grid[j][x] = Unit.FLAME_0
 			j += 1
 
 		j = y
-		while ( j > max(Y_MIN,y-bomberman.get_scope()-1) and self.grid[j][x] >= Unit.BOX ):
+		no_box_destroy = True
+		while ( j > max(Y_MIN,y-bomberman.get_scope()-1) and self.grid[j][x] >= Unit.BOX and no_box_destroy ):
+			if ( self.grid[j][x] == Unit.BOX ):
+				no_box_destroy = False
 			self.grid[j][x] = Unit.FLAME_0
 			j -= 1
 
 		i = x
-		while ( i < min(X_MAX,x+bomberman.get_scope()+1) and self.grid[y][i] >= Unit.BOX ):
+		no_box_destroy = True
+		while ( i < min(X_MAX,x+bomberman.get_scope()+1) and self.grid[y][i] >= Unit.BOX and no_box_destroy ):
+			if ( self.grid[y][i] == Unit.BOX ):
+				no_box_destroy = False
 			self.grid[y][i] = Unit.FLAME_0
 			i += 1
 
 		i = x
-		while ( i > max(X_MIN,x-bomberman.get_scope()-1) and self.grid[y][i] >= Unit.BOX ):
+		no_box_destroy = True
+		while ( i > max(X_MIN,x-bomberman.get_scope()-1) and self.grid[y][i] >= Unit.BOX and no_box_destroy ):
+			if ( self.grid[y][i] == Unit.BOX ):
+				no_box_destroy = False
 			self.grid[y][i] = Unit.FLAME_0
 			i -= 1
 
