@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# import mysql.connector # il semble que ce module doit etre importé en premier sinon risque de boucle infinie
+# import mysql.connector
 import random
 import json
 import pygame
@@ -245,9 +245,8 @@ class Labyrinth:
 		"""
 		self.grid[position.y][position.x] = Unit.BOMB_1
 
-	def bomb_explose(self, position, scope):
+	def bomb_explose(self, scope):
 		""" Fait exploser les bombes sur le labyrinthe avec une porté caractérisé par 'scope'.
-			Retourne vrai si le bomberman caractérisé par 'position' est touché. Retourne faux sinon.
 			Paramètres:
 				'position':
 					<Position>
@@ -255,9 +254,6 @@ class Labyrinth:
 				'scope':
 					<nombre>
 					la portée des bombes du bomberman
-			Valeur de retour:
-				<booléen>
-				vrai si bomberman touché, faux sinon
 		"""
 		for j in range(Y_MIN, Y_MAX):
 			for i in range(X_MIN, X_MAX):
@@ -312,8 +308,6 @@ class Labyrinth:
 						if self.grid[j][k] == Unit.BLOCK:
 							break
 
-		return self.bomberman_touched(position)
-
 	def bomberman_touched(self, position):
 		""" Retourne vrai si le bomberman caractérisé par 'position' est touché. Retourne faux sinon.
 			Paramètres:
@@ -328,8 +322,16 @@ class Labyrinth:
 			return True
 		return False
 
-	def burn(self):
+	def burn(self, position):
 		""" Fait bruler les flammes sur le labyrinthe.
+			Retourne vrai si le bomberman caractérisé par 'position' est touché. Retourne faux sinon.
+			Paramètres:
+				'position':
+					<Position>
+					la position du bomberman dans le labyrinthe
+			Valeur de retour:
+				<booléen>
+				vrai si bomberman touché, faux sinon
 		"""
 		for j in range(Y_MIN, Y_MAX):
 			for i in range(X_MIN, X_MAX):
@@ -343,10 +345,10 @@ class Labyrinth:
 					self.grid[j][i] = Unit.FLAME_4
 				elif self.grid[j][i] == Unit.FLAME_4:
 					self.grid[j][i] = Unit.GROUND
-
 		for creep in self.creeps:
 			if (self.grid[creep.position.y][creep.position.x] >= Unit.FLAME_0 and self.grid[creep.position.y][creep.position.x] <= Unit.FLAME_4):
 				self.creeps.remove(creep)
+		return self.bomberman_touched(position)
 
 	def update_creeps_move_index(self):
 		""" Met à jour la valeur de l'attribut 'move_index' dand le but de donner aux creeps une impression de marche lors de leurs déplacements.

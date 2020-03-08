@@ -80,9 +80,9 @@ def adventure():
 				labyrinth.move_creeps()
 				labyrinth.update_creeps_move_index()
 			if event.type == pygame.USEREVENT + EVENT_ONE_HALF_SECOND:
-				loop = not labyrinth.bomb_explose(bomberman.get_position(), bomberman.get_scope())
+				labyrinth.bomb_explose(bomberman.get_scope())
 			if event.type == pygame.USEREVENT + EVENT_ONE_TWENTIETH_SECOND:
-				labyrinth.burn()
+				loop = not labyrinth.burn(bomberman.get_position())
 			for k in range(0, MAX_BOMB_AMOUNT):	# bug
 				if event.type == pygame.USEREVENT + event_bomb_explose[k]:
 					pygame.time.set_timer(pygame.USEREVENT + event_bomb_explose[k], 0)
