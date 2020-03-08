@@ -252,6 +252,16 @@ class Labyrinth:
 			self.grid[y][i] = Unit.FLAME_0
 			i -= 1
 
+
+		for creep in self.creeps:
+			if (self.grid[creep.position.y][creep.position.x] >= Unit.FLAME_0 and self.grid[creep.position.y][creep.position.x] <= Unit.FLAME_4):
+				self.creeps.remove(creep)
+
+		#Bomberman touché
+		if (self.grid[bomberman.position.y][bomberman.position.x] >= Unit.FLAME_0 and self.grid[bomberman.position.y][bomberman.position.x] <= Unit.FLAME_4):
+			bomberman.position.y = Y_MIN + 1
+			bomberman.position.x = X_MIN + 1
+
 	def burning(self):
 		for j in range(Y_MIN, Y_MAX):
 			for i in range(X_MIN, X_MAX):
