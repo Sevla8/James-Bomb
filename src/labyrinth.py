@@ -320,6 +320,9 @@ class Labyrinth:
 		"""
 		if (self.grid[position.y][position.x] >= Unit.FLAME_0 and self.grid[position.y][position.x] <= Unit.FLAME_4):
 			return True
+		for creep in self.creeps:
+			if creep.position.y == position.y and creep.position.x == position.x:
+				return True
 		return False
 
 	def burn(self, position):
