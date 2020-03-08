@@ -311,9 +311,7 @@ class Labyrinth:
 							break
 						if self.grid[j][k] == Unit.BLOCK:
 							break
-		for creep in self.creeps:
-			if (self.grid[creep.position.y][creep.position.x] >= Unit.FLAME_0 and self.grid[creep.position.y][creep.position.x] <= Unit.FLAME_4):
-				self.creeps.remove(creep)
+
 		return self.bomberman_touched(position)
 
 	def bomberman_touched(self, position):
@@ -345,6 +343,10 @@ class Labyrinth:
 					self.grid[j][i] = Unit.FLAME_4
 				elif self.grid[j][i] == Unit.FLAME_4:
 					self.grid[j][i] = Unit.GROUND
+
+		for creep in self.creeps:
+			if (self.grid[creep.position.y][creep.position.x] >= Unit.FLAME_0 and self.grid[creep.position.y][creep.position.x] <= Unit.FLAME_4):
+				self.creeps.remove(creep)
 
 	def update_creeps_move_index(self):
 		""" Met à jour la valeur de l'attribut 'move_index' dand le but de donner aux creeps une impression de marche lors de leurs déplacements.
