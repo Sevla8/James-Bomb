@@ -274,7 +274,7 @@ class Labyrinth:
 							self.portal_visible = True
 							break
 						if self.grid[k][i] == Unit.BOX:
-							self.grid[k][i] = Unit.GROUND
+							self.grid[k][i] = Unit.FLAME_0
 							break
 						if self.grid[k][i] == Unit.BLOCK:
 							break
@@ -285,7 +285,7 @@ class Labyrinth:
 							self.portal_visible = True
 							break
 						if self.grid[k][i] == Unit.BOX:
-							self.grid[k][i] = Unit.GROUND
+							self.grid[k][i] = Unit.FLAME_0
 							break
 						if self.grid[k][i] == Unit.BLOCK:
 							break
@@ -296,7 +296,7 @@ class Labyrinth:
 							self.portal_visible = True
 							break
 						if self.grid[j][k] == Unit.BOX:
-							self.grid[j][k] = Unit.GROUND
+							self.grid[j][k] = Unit.FLAME_0
 							break
 						if self.grid[j][k] == Unit.BLOCK:
 							break
@@ -307,7 +307,7 @@ class Labyrinth:
 							self.portal_visible = True
 							break
 						if self.grid[j][k] == Unit.BOX:
-							self.grid[j][k] = Unit.GROUND
+							self.grid[j][k] = Unit.FLAME_0
 							break
 						if self.grid[j][k] == Unit.BLOCK:
 							break
