@@ -17,7 +17,7 @@ class Labyrinth:
 		self.ground = pygame.image.load(UNIT_GROUND)
 		self.block = pygame.image.load(UNIT_BLOCK)
 		self.box = pygame.image.load(UNIT_BOX)
-		self.portal = pygame.image.load(UNIT_PORTAL)
+		self.portal = pygame.image.load(UNIT_PORTAL).convert_alpha()
 		self.bomb = [pygame.image.load(BOMB_1).convert_alpha(), pygame.image.load(BOMB_2).convert_alpha(), pygame.image.load(BOMB_3).convert_alpha()]
 		self.flame = [pygame.image.load(FLAME_0).convert_alpha(), pygame.image.load(FLAME_1).convert_alpha(), pygame.image.load(FLAME_2).convert_alpha(), pygame.image.load(FLAME_3).convert_alpha(), pygame.image.load(FLAME_4).convert_alpha()]
 		self.grid = [[Unit.GROUND] * Y_MAX for k in range(X_MAX)]
@@ -379,6 +379,7 @@ class Labyrinth:
 					window.blit(pygame.transform.scale(self.box, (size_unit, size_unit)), (i*size_unit, j*size_unit))
 				elif self.grid[j][i] == Unit.PORTAL:
 					if self.portal_visible:
+						window.blit(pygame.transform.scale(self.ground, (size_unit, size_unit)), (i*size_unit, j*size_unit))
 						window.blit(pygame.transform.scale(self.portal, (size_unit, size_unit)), (i*size_unit, j*size_unit))
 					else:
 						window.blit(pygame.transform.scale(self.box, (size_unit, size_unit)), (i*size_unit, j*size_unit))
