@@ -6,9 +6,19 @@ from constants import *
 from bomberman import *
 from direction import *
 import pygame
+import pygameMenu
 import menu
 
+pause_menu = None
+window = None
+
+def pause_background():
+	pass
+
 def adventure():
+	global window
+	global pause_menu
+
 	window = pygame.display.set_mode(WINDOW_SIZE, pygame.RESIZABLE)
 	pygame.display.set_caption(WINDOW_CAPTION)
 	pygame.key.set_repeat(400, 30)
@@ -28,9 +38,32 @@ def adventure():
 	event_bomb_explose_active = [False] * 10
 	current_bomb_index = 0
 
+# Main menu, pauses execution of the application
+	pause_menu = pygameMenu.Menu(window,
+															back_box=False,
+                              bgfun=pause_background,
+                              enabled=False,
+                              font=pygameMenu.font.FONT_BEBAS,
+															font_color=COLOR_BLACK,
+                              menu_alpha=90,
+															menu_color=COLOR_BACKGROUND,
+                              fps=FPS,
+                              onclose=pygameMenu.events.CLOSE,
+                              title='Pause Menu',
+															option_shadow=False,
+                              title_offsety=5,
+                              window_height=WINDOW_SIZE[1],
+															window_width=WINDOW_SIZE[0],
+															mouse_enabled=True,
+															mouse_visible=True
+                              )
+
+	pause_menu.add_option('Resume', pygameMenu.events.CLOSE)  
+	pause_menu.add_option('Save & Quit', menu.principal_menu)
+
 	loop = True
 	while loop:
-		pygame.event.pump()
+		#pygame.event.pump()
 		event = pygame.event.wait()
 		# if event.type == pygame.VIDEORESIZE:	# bug
 		# 	size_unit = min(int(event.w / 15), int(event.h / 15))
@@ -39,7 +72,7 @@ def adventure():
 			exit()
 		elif event.type == pygame.KEYDOWN:
 			if event.key == pygame.K_ESCAPE:
-				loop = False
+				pause_menu.enable()
 			elif event.key == pygame.K_RIGHT:
 				bomberman.turn(Direction.RIGHT)
 				bomberman.update_move_index()
@@ -90,6 +123,7 @@ def adventure():
 					bomberman.bomb_explose()
 		labyrinth.print(window, size_unit)
 		bomberman.print(window, size_unit)
+		pause_menu.mainloop(event, disable_loop=False)
 		pygame.display.flip()
 
-	menu.principal_menu()
+	#menu.principal_menu()
