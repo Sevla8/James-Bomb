@@ -4,7 +4,7 @@ Bomberman game
 ## Dépendances 
 - python (version 3+)
 - [pygame](https://www.pygame.org/wiki/GettingStarted)
-- [pygameMenu](https://github.com/ppizarror/pygame-menu)
+- [pygame-menu](https://github.com/ppizarror/pygame-menu)
 - [mysql.connector](https://pynative.com/install-mysql-connector-python/)
 
 ## Lancer le projet
