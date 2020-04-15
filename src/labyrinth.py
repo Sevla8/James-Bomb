@@ -29,7 +29,6 @@ class Labyrinth:
 		self.creeps = []
 		for i in range(DEFAULT_CREEP_AMOUNT):
 			self.creeps.append(Creep())
-		self.portal_visible = False
 
 	def load(self, stage):
 		""" Charger un labyrinthe en fonction de l'avancement dans le jeu (caractérisé par 'stage').
@@ -101,7 +100,7 @@ class Labyrinth:
 					if random.choice([True, False]):
 						if random.choice([True, False, False, False, False, False, False, False, False, False]):
 							self.grid[j][i] = Unit.BOMB_POWERUP_HIDDEN
-						elif random.choice([True, False, False, False, False, False, False, False, False, False]):
+						elif random.choice([True, False, False, False, False, False, False, False, False]):
 							self.grid[j][i] = Unit.FLAME_POWERUP_HIDDEN
 						else:
 							self.grid[j][i] = Unit.BOX
@@ -110,7 +109,7 @@ class Labyrinth:
 			y = random.randint(Y_MIN, Y_MAX-1)
 			x = random.randint(X_MIN, X_MAX-1)
 			if self.grid[y][x] == Unit.BOX:
-				self.grid[y][x] = Unit.PORTAL
+				self.grid[y][x] = Unit.PORTAL_HIDDEN
 				portal_ok = True
 		self.generate_creeps()
 
@@ -156,26 +155,18 @@ class Labyrinth:
 				<booléen>
 				vrai si mouvement valide, faux sinon
 		"""
-		# On peut marcher sur le sol, dans les flammes, sur le portal lorsqu'il est visible
+		# On peut marcher sur le sol, dans les flammes, sur le portal visible, sur les bonus visibles.
 		if direction == Direction.RIGHT:
 			if self.grid[position.y][position.x+1] >= Unit.PORTAL:
-				if self.grid[position.y][position.x+1] == Unit.PORTAL and not self.portal_visible:
-					return False
 				return True
 		if direction == Direction.LEFT:
 			if self.grid[position.y][position.x-1] >= Unit.PORTAL:
-				if self.grid[position.y][position.x-1] == Unit.PORTAL and not self.portal_visible:
-					return False
 				return True
 		if direction == Direction.UP:
 			if self.grid[position.y-1][position.x] >= Unit.PORTAL:
-				if self.grid[position.y-1][position.x] == Unit.PORTAL and not self.portal_visible:
-					return False
 				return True
 		if direction == Direction.DOWN:
 			if self.grid[position.y+1][position.x] >= Unit.PORTAL:
-				if self.grid[position.y+1][position.x] == Unit.PORTAL and not self.portal_visible:
-					return False
 				return True
 		return False
 
@@ -217,7 +208,7 @@ class Labyrinth:
 			# sinon on cherche une autre direction au hasard
 			else:
 				dead_end = False
-				if self.grid[creep.position.y+1][creep.position.x] != Unit.GROUND and self.grid[creep.position.y-1][creep.position.x] != Unit.GROUND and self.grid[creep.position.y][creep.position.x+1] != Unit.GROUND and self.grid[creep.position.y][creep.position.x-1] != Unit.GROUND:
+				if self.grid[creep.position.y+1][creep.position.x] <= Unit.PORTAL and self.grid[creep.position.y-1][creep.position.x] <= Unit.PORTAL and self.grid[creep.position.y][creep.position.x+1] <= Unit.PORTAL and self.grid[creep.position.y][creep.position.x-1] <= Unit.PORTAL:
 					dead_end = True
 				if not dead_end:
 					next_direction = random.choice([Direction.UP, Direction.LEFT, Direction.RIGHT, Direction.DOWN])
@@ -229,6 +220,10 @@ class Labyrinth:
 					else:
 						creep.turn(next_direction)
 						creep.move(next_direction)
+						if self.grid[creep.position.y][creep.position.x] == Unit.BOMB_POWERUP:
+							self.grid[creep.position.y][creep.position.x] = Unit.GROUND
+						elif self.grid[creep.position.y][creep.position.x] == Unit.FLAME_POWERUP:
+							self.grid[creep.position.y][creep.position.x] = Unit.GROUND
 
 	def can_drop_bomb(self, position):
 		""" Retourne vrai si une bombe peut être posée à l'emplacement caractérisé par 'position'. Retourne faux sinon.
@@ -273,7 +268,9 @@ class Labyrinth:
 						if self.grid[k][i] == Unit.GROUND:
 							self.grid[k][i] = Unit.FLAME_0
 						if self.grid[k][i] == Unit.PORTAL:
-							self.portal_visible = True
+							break
+						if self.grid[k][i] == Unit.PORTAL_HIDDEN:
+							self.grid[k][i] = Unit.PORTAL
 							break
 						if self.grid[k][i] == Unit.BOX:
 							self.grid[k][i] = Unit.FLAME_0
@@ -291,12 +288,17 @@ class Labyrinth:
 							break
 						if self.grid[k][i] == Unit.FLAME_POWERUP:
 							self.grid[k][i] = Unit.FLAME_0
+							break
+						if self.grid[k][i] >= Unit.BOMB_1 and self.grid[k][i] <= Unit.BOMB_3:
+							self.chain_reaction(Position(i, k), scope)
 							break
 					for k in range(j, min(Y_MAX, j+scope+1), 1):
 						if self.grid[k][i] == Unit.GROUND:
 							self.grid[k][i] = Unit.FLAME_0
 						if self.grid[k][i] == Unit.PORTAL:
-							self.portal_visible = True
+							break
+						if self.grid[k][i] == Unit.PORTAL_HIDDEN:
+							self.grid[k][i] = Unit.PORTAL
 							break
 						if self.grid[k][i] == Unit.BOX:
 							self.grid[k][i] = Unit.FLAME_0
@@ -315,11 +317,16 @@ class Labyrinth:
 						if self.grid[k][i] == Unit.FLAME_POWERUP:
 							self.grid[k][i] = Unit.FLAME_0
 							break
+						if self.grid[k][i] >= Unit.BOMB_1 and self.grid[k][i] <= Unit.BOMB_3:
+							self.chain_reaction(Position(i, k), scope)
+							break
 					for k in range(i, max(X_MIN, i-scope-1), -1):
 						if self.grid[j][k] == Unit.GROUND:
 							self.grid[j][k] = Unit.FLAME_0
 						if self.grid[j][k] == Unit.PORTAL:
-							self.portal_visible = True
+							break
+						if self.grid[j][k] == Unit.PORTAL_HIDDEN:
+							self.grid[j][k] = Unit.PORTAL
 							break
 						if self.grid[j][k] == Unit.BOX:
 							self.grid[j][k] = Unit.FLAME_0
@@ -337,12 +344,17 @@ class Labyrinth:
 							break
 						if self.grid[j][k] == Unit.FLAME_POWERUP:
 							self.grid[j][k] = Unit.FLAME_0
+							break
+						if self.grid[j][k] >= Unit.BOMB_1 and self.grid[j][k] <= Unit.BOMB_3:
+							self.chain_reaction(Position(k, j), scope)
 							break
 					for k in range(i, min(X_MAX, i+scope+1), 1):
 						if self.grid[j][k] == Unit.GROUND:
 							self.grid[j][k] = Unit.FLAME_0
 						if self.grid[j][k] == Unit.PORTAL:
-							self.portal_visible = True
+							break
+						if self.grid[j][k] == Unit.PORTAL_HIDDEN:
+							self.grid[j][k] = Unit.PORTAL
 							break
 						if self.grid[j][k] == Unit.BOX:
 							self.grid[j][k] = Unit.FLAME_0
@@ -361,6 +373,126 @@ class Labyrinth:
 						if self.grid[j][k] == Unit.FLAME_POWERUP:
 							self.grid[j][k] = Unit.FLAME_0
 							break
+						if self.grid[j][k] >= Unit.BOMB_1 and self.grid[j][k] <= Unit.BOMB_3:
+							self.chain_reaction(Position(k, j), scope)
+							break
+
+	def chain_reaction(self, position, scope):
+		j = position.y
+		i = position.x
+		self.grid[j][i] = Unit.FLAME_0
+		for k in range(j, max(Y_MIN, j-scope-1), -1):
+			if self.grid[k][i] == Unit.GROUND:
+				self.grid[k][i] = Unit.FLAME_0
+			if self.grid[k][i] == Unit.PORTAL:
+				break
+			if self.grid[k][i] == Unit.PORTAL_HIDDEN:
+				self.grid[k][i] = Unit.PORTAL
+				break
+			if self.grid[k][i] == Unit.BOX:
+				self.grid[k][i] = Unit.FLAME_0
+				break
+			if self.grid[k][i] == Unit.BLOCK:
+				break
+			if self.grid[k][i] == Unit.BOMB_POWERUP_HIDDEN:
+				self.grid[k][i] = Unit.BOMB_POWERUP
+				break
+			if self.grid[k][i] == Unit.BOMB_POWERUP:
+				self.grid[k][i] = Unit.FLAME_0
+				break
+			if self.grid[k][i] == Unit.FLAME_POWERUP_HIDDEN:
+				self.grid[k][i] = Unit.FLAME_POWERUP
+				break
+			if self.grid[k][i] == Unit.FLAME_POWERUP:
+				self.grid[k][i] = Unit.FLAME_0
+				break
+			if self.grid[k][i] >= Unit.BOMB_1 and self.grid[k][i] <= Unit.BOMB_3:
+				self.chain_reaction(Position(i, k), scope)
+				break
+		for k in range(j, min(Y_MAX, j+scope+1), 1):
+			if self.grid[k][i] == Unit.GROUND:
+				self.grid[k][i] = Unit.FLAME_0
+			if self.grid[k][i] == Unit.PORTAL:
+				break
+			if self.grid[k][i] == Unit.PORTAL_HIDDEN:
+				self.grid[k][i] = Unit.PORTAL
+				break
+			if self.grid[k][i] == Unit.BOX:
+				self.grid[k][i] = Unit.FLAME_0
+				break
+			if self.grid[k][i] == Unit.BLOCK:
+				break
+			if self.grid[k][i] == Unit.BOMB_POWERUP_HIDDEN:
+				self.grid[k][i] = Unit.BOMB_POWERUP
+				break
+			if self.grid[k][i] == Unit.BOMB_POWERUP:
+				self.grid[k][i] = Unit.FLAME_0
+				break
+			if self.grid[k][i] == Unit.FLAME_POWERUP_HIDDEN:
+				self.grid[k][i] = Unit.FLAME_POWERUP
+				break
+			if self.grid[k][i] == Unit.FLAME_POWERUP:
+				self.grid[k][i] = Unit.FLAME_0
+				break
+			if self.grid[k][i] >= Unit.BOMB_1 and self.grid[k][i] <= Unit.BOMB_3:
+				self.chain_reaction(Position(i, k), scope)
+				break
+		for k in range(i, max(X_MIN, i-scope-1), -1):
+			if self.grid[j][k] == Unit.GROUND:
+				self.grid[j][k] = Unit.FLAME_0
+			if self.grid[j][k] == Unit.PORTAL:
+				break
+			if self.grid[j][k] == Unit.PORTAL_HIDDEN:
+				self.grid[j][k] = Unit.PORTAL
+				break
+			if self.grid[j][k] == Unit.BOX:
+				self.grid[j][k] = Unit.FLAME_0
+				break
+			if self.grid[j][k] == Unit.BLOCK:
+				break
+			if self.grid[j][k] == Unit.BOMB_POWERUP_HIDDEN:
+				self.grid[j][k] = Unit.BOMB_POWERUP
+				break
+			if self.grid[j][k] == Unit.BOMB_POWERUP:
+				self.grid[j][k] = Unit.FLAME_0
+				break
+			if self.grid[j][k] == Unit.FLAME_POWERUP_HIDDEN:
+				self.grid[j][k] = Unit.FLAME_POWERUP
+				break
+			if self.grid[j][k] == Unit.FLAME_POWERUP:
+				self.grid[j][k] = Unit.FLAME_0
+				break
+			if self.grid[j][k] >= Unit.BOMB_1 and self.grid[j][k] <= Unit.BOMB_3:
+				self.chain_reaction(Position(k, j), scope)
+				break
+		for k in range(i, min(X_MAX, i+scope+1), 1):
+			if self.grid[j][k] == Unit.GROUND:
+				self.grid[j][k] = Unit.FLAME_0
+			if self.grid[j][k] == Unit.PORTAL:
+				break
+			if self.grid[j][k] == Unit.PORTAL_HIDDEN:
+				self.grid[j][k] = Unit.PORTAL
+				break
+			if self.grid[j][k] == Unit.BOX:
+				self.grid[j][k] = Unit.FLAME_0
+				break
+			if self.grid[j][k] == Unit.BLOCK:
+				break
+			if self.grid[j][k] == Unit.BOMB_POWERUP_HIDDEN:
+				self.grid[j][k] = Unit.BOMB_POWERUP
+				break
+			if self.grid[j][k] == Unit.BOMB_POWERUP:
+				self.grid[j][k] = Unit.FLAME_0
+				break
+			if self.grid[j][k] == Unit.FLAME_POWERUP_HIDDEN:
+				self.grid[j][k] = Unit.FLAME_POWERUP
+				break
+			if self.grid[j][k] == Unit.FLAME_POWERUP:
+				self.grid[j][k] = Unit.FLAME_0
+				break
+			if self.grid[j][k] >= Unit.BOMB_1 and self.grid[j][k] <= Unit.BOMB_3:
+				self.chain_reaction(Position(k, j), scope)
+				break
 
 	def bomberman_touched(self, position):
 		""" Retourne vrai si le bomberman caractérisé par 'position' est touché. Retourne faux sinon.
@@ -440,10 +572,9 @@ class Labyrinth:
 				elif self.grid[j][i] == Unit.BOX:
 					window.blit(pygame.transform.scale(self.box, (size_unit, size_unit)), (i*size_unit, j*size_unit))
 				elif self.grid[j][i] == Unit.PORTAL:
-					if self.portal_visible:
-						window.blit(pygame.transform.scale(self.ground, (size_unit, size_unit)), (i*size_unit, j*size_unit))
-						window.blit(pygame.transform.scale(self.portal, (size_unit, size_unit)), (i*size_unit, j*size_unit))
-					else:
+					window.blit(pygame.transform.scale(self.ground, (size_unit, size_unit)), (i*size_unit, j*size_unit))
+					window.blit(pygame.transform.scale(self.portal, (size_unit, size_unit)), (i*size_unit, j*size_unit))
+				elif self.grid[j][i] == Unit.PORTAL_HIDDEN:
 						window.blit(pygame.transform.scale(self.box, (size_unit, size_unit)), (i*size_unit, j*size_unit))
 				elif self.grid[j][i] == Unit.BOMB_1:
 					window.blit(pygame.transform.scale(self.ground, (size_unit, size_unit)), (i*size_unit, j*size_unit))

@@ -31,9 +31,9 @@ def adventure():
 	# labyrinth.load(stage)
 	bomberman = Bomberman()
 
-	pygame.time.set_timer(pygame.USEREVENT + EVENT_ONE_SECOND, SECOND)
-	pygame.time.set_timer(pygame.USEREVENT + EVENT_ONE_HALF_SECOND, HALF_SECOND)
-	pygame.time.set_timer(pygame.USEREVENT + EVENT_ONE_TWENTIETH_SECOND, TWENTIETH_SECOND)
+	pygame.time.set_timer(pygame.USEREVENT + EVENT_MOVE_CREEPS, SECOND)
+	pygame.time.set_timer(pygame.USEREVENT + EVENT_BOMB_TIMEOUT, HALF_SECOND)
+	pygame.time.set_timer(pygame.USEREVENT + EVENT_FLAME_BURN, TWENTIETH_SECOND)
 	event_bomb_explose = [EVENT_BOMB_EXPLOSE_0, EVENT_BOMB_EXPLOSE_1, EVENT_BOMB_EXPLOSE_2, EVENT_BOMB_EXPLOSE_3, EVENT_BOMB_EXPLOSE_4, EVENT_BOMB_EXPLOSE_5, EVENT_BOMB_EXPLOSE_6, EVENT_BOMB_EXPLOSE_7, EVENT_BOMB_EXPLOSE_8, EVENT_BOMB_EXPLOSE_9]
 	event_bomb_explose_active = [False] * 10
 	current_bomb_index = 0
@@ -115,12 +115,12 @@ def adventure():
 					event_bomb_explose_active[current_bomb_index] = True
 					current_bomb_index = (current_bomb_index + 1) % MAX_BOMB_AMOUNT
 		elif event.type >= pygame.NOEVENT and event.type <= pygame.NUMEVENTS:
-			if event.type == pygame.USEREVENT + EVENT_ONE_SECOND:
+			if event.type == pygame.USEREVENT + EVENT_MOVE_CREEPS:
 				labyrinth.move_creeps()
 				labyrinth.update_creeps_move_index()
-			if event.type == pygame.USEREVENT + EVENT_ONE_HALF_SECOND:
+			if event.type == pygame.USEREVENT + EVENT_BOMB_TIMEOUT:
 				labyrinth.bomb_explose(bomberman.get_scope())
-			if event.type == pygame.USEREVENT + EVENT_ONE_TWENTIETH_SECOND:
+			if event.type == pygame.USEREVENT + EVENT_FLAME_BURN:
 				loop = not labyrinth.burn(bomberman.get_position())
 			for k in range(0, MAX_BOMB_AMOUNT):	# bug
 				if event.type == pygame.USEREVENT + event_bomb_explose[k]:
