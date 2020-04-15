@@ -21,7 +21,7 @@ def adventure():
 
 	window = pygame.display.set_mode(WINDOW_SIZE, pygame.RESIZABLE)
 	pygame.display.set_caption(WINDOW_CAPTION)
-	pygame.key.set_repeat(400, 30)
+	pygame.key.set_repeat(1, int(SECOND/3))
 	size_unit = DEFAULT_SIZE_UNIT
 
 	stage = 1
@@ -38,32 +38,30 @@ def adventure():
 	event_bomb_explose_active = [False] * 10
 	current_bomb_index = 0
 
-# Main menu, pauses execution of the application
+	# Main menu, pauses execution of the application
 	pause_menu = pygameMenu.Menu(window,
-															back_box=False,
-                              bgfun=pause_background,
-                              enabled=False,
-                              font=pygameMenu.font.FONT_BEBAS,
-															font_color=COLOR_BLACK,
-                              menu_alpha=90,
-															menu_color=COLOR_BACKGROUND,
-                              fps=FPS,
-                              onclose=pygameMenu.events.CLOSE,
-                              title='Pause Menu',
-															option_shadow=False,
-                              title_offsety=5,
-                              window_height=WINDOW_SIZE[1],
-															window_width=WINDOW_SIZE[0],
-															mouse_enabled=True,
-															mouse_visible=True
-                              )
+								 back_box=False,
+								 bgfun=pause_background,
+								 enabled=False,
+								 font=pygameMenu.font.FONT_BEBAS,
+								 font_color=COLOR_BLACK,
+								 menu_alpha=90,
+								 menu_color=COLOR_BACKGROUND,
+								 fps=FPS,
+								 onclose=pygameMenu.events.CLOSE,
+								 title='Pause Menu',
+								 option_shadow=False,
+								 title_offsety=5,
+								 window_height=WINDOW_SIZE[1],
+								 window_width=WINDOW_SIZE[0],
+								 mouse_enabled=True,
+								 mouse_visible=True)
 
-	pause_menu.add_option('Resume', pygameMenu.events.CLOSE)  
+	pause_menu.add_option('Resume', pygameMenu.events.CLOSE)
 	pause_menu.add_option('Save & Quit', menu.principal_menu)
 
 	loop = True
 	while loop:
-		#pygame.event.pump()
 		event = pygame.event.wait()
 		# if event.type == pygame.VIDEORESIZE:	# bug
 		# 	size_unit = min(int(event.w / 15), int(event.h / 15))
@@ -78,24 +76,32 @@ def adventure():
 				bomberman.update_move_index()
 				if labyrinth.valid_move(bomberman.position, Direction.RIGHT):
 					bomberman.move(Direction.RIGHT)
+					powerups = labyrinth.check_powerups(bomberman.get_position())
+					bomberman.skill_up(powerups)
 					loop = not labyrinth.bomberman_on_portal(bomberman.get_position())
 			elif event.key == pygame.K_LEFT:
 				bomberman.turn(Direction.LEFT)
 				bomberman.update_move_index()
 				if labyrinth.valid_move(bomberman.position, Direction.LEFT):
 					bomberman.move(Direction.LEFT)
+					powerups = labyrinth.check_powerups(bomberman.get_position())
+					bomberman.skill_up(powerups)
 					loop = not labyrinth.bomberman_on_portal(bomberman.get_position())
 			elif event.key == pygame.K_UP:
 				bomberman.turn(Direction.UP)
 				bomberman.update_move_index()
 				if labyrinth.valid_move(bomberman.position, Direction.UP):
 					bomberman.move(Direction.UP)
+					powerups = labyrinth.check_powerups(bomberman.get_position())
+					bomberman.skill_up(powerups)
 					loop = not labyrinth.bomberman_on_portal(bomberman.get_position())
 			elif event.key == pygame.K_DOWN:
 				bomberman.turn(Direction.DOWN)
 				bomberman.update_move_index()
 				if labyrinth.valid_move(bomberman.position, Direction.DOWN):
 					bomberman.move(Direction.DOWN)
+					powerups = labyrinth.check_powerups(bomberman.get_position())
+					bomberman.skill_up(powerups)
 					loop = not labyrinth.bomberman_on_portal(bomberman.get_position())
 			elif event.key == pygame.K_SPACE:
 				if labyrinth.can_drop_bomb(bomberman.position) and bomberman.can_drop_bomb():
@@ -125,5 +131,3 @@ def adventure():
 		bomberman.print(window, size_unit)
 		pause_menu.mainloop(event, disable_loop=False)
 		pygame.display.flip()
-
-	#menu.principal_menu()

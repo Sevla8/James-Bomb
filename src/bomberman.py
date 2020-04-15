@@ -59,6 +59,12 @@ class Bomberman(Character):
 		"""
 		return self.position
 
+	def skill_up(self, powerups):
+		if powerups == BOMB_UP:
+			self.skill.bomb_amount = (self.skill.bomb_amount + 1) % 10
+		elif powerups == FLAME_UP:
+			self.skill.scope = (self.skill.scope + 1) % 10
+
 	def print(self, window, size_unit):
 		""" Affiche le bomberman dans la fenêtre caractérisé par 'window'.
 			Paramètres:
