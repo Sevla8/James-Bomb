@@ -23,7 +23,7 @@ class Character:
 		self.xp
 
 	def move(self, direction):
-		""" Fait se déplacer un personnage dans la direction caractérisé par 'position'.
+		""" Fait se déplacer un personnage dans la direction caractérisé par 'direction'.
 			Paramètres:
 				'direction':
 					<Direction>
@@ -39,7 +39,11 @@ class Character:
 			self.position.y += 1
 
 	def turn(self, direction):
-		""" Fait tourner un personnage.
+		""" Fait tourner un personnage vers la direction caractérisé par 'direction'.
+			Paramètres:
+				'direction':
+					<Direction>
+					la direction courante du personnage
 		"""
 		if direction == Direction.RIGHT:
 			self.direction = Direction.RIGHT
@@ -61,6 +65,9 @@ class Character:
 				'window':
 					<pygame.Surface>
 					la fenetre courante
+				'size_unit':
+					<nombre>
+					la taille en pixel d'une unité de surface
 		"""
 		if self.direction == Direction.RIGHT:
 			window.blit(pygame.transform.scale(self.right[self.move_index], (size_unit, size_unit)), (self.position.x*size_unit, self.position.y*size_unit))

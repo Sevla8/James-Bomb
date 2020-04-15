@@ -10,6 +10,8 @@ from character import *
 
 class Creep(Character):
 	def __init__(self):
+		""" Construit un Creep.
+		"""
 		self.right = [pygame.image.load(CREEP_RIGHT_0).convert_alpha(), pygame.image.load(CREEP_RIGHT_1).convert_alpha(), pygame.image.load(CREEP_RIGHT_2).convert_alpha(), pygame.image.load(CREEP_RIGHT_3).convert_alpha(), pygame.image.load(CREEP_RIGHT_4).convert_alpha(), pygame.image.load(CREEP_RIGHT_5).convert_alpha()]
 		self.left = [pygame.image.load(CREEP_LEFT_0).convert_alpha(), pygame.image.load(CREEP_LEFT_1).convert_alpha(), pygame.image.load(CREEP_LEFT_2).convert_alpha(), pygame.image.load(CREEP_LEFT_3).convert_alpha(), pygame.image.load(CREEP_LEFT_4).convert_alpha(), pygame.image.load(CREEP_LEFT_5).convert_alpha()]
 		self.front = [pygame.image.load(CREEP_FRONT_0).convert_alpha(), pygame.image.load(CREEP_FRONT_1).convert_alpha(), pygame.image.load(CREEP_FRONT_2).convert_alpha(), pygame.image.load(CREEP_FRONT_3).convert_alpha(), pygame.image.load(CREEP_FRONT_4).convert_alpha(), pygame.image.load(CREEP_FRONT_5).convert_alpha()]

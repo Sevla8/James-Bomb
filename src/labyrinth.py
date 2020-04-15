@@ -75,7 +75,7 @@ class Labyrinth:
 			creep.position = attempt
 
 	def invalid_creep_initial_position(self, position):
-		""" Retourne vrai si un creep ne peu être positionné à la position caractérisée par 'position'.
+		""" Retourne vrai si un creep ne peu être positionné à la position caractérisée par 'position'. Retourne faux sinon.
 			Paramètres:
 				'position':
 					<Position>
@@ -249,9 +249,6 @@ class Labyrinth:
 	def bomb_explose(self, scope):
 		""" Fait exploser les bombes sur le labyrinthe avec une porté caractérisé par 'scope'.
 			Paramètres:
-				'position':
-					<Position>
-					la position du bomberman dans le labyrinthe
 				'scope':
 					<nombre>
 					la portée des bombes du bomberman
@@ -378,6 +375,15 @@ class Labyrinth:
 							break
 
 	def chain_reaction(self, position, scope):
+		""" Fait exploser les bombes qui sont déclanchés par une explosion en chaîne sur le labyrinthe avec une porté caractérisé par 'scope'.
+			Paramètres:
+				'position':
+					<Position>
+					la position de la bombe entrainant la réaction en chaîne dans le labyrinthe
+				'scope':
+					<nombre>
+					la portée des bombes du bomberman
+		"""
 		j = position.y
 		i = position.x
 		self.grid[j][i] = Unit.FLAME_0
@@ -546,9 +552,27 @@ class Labyrinth:
 			creep.update_move_index()
 
 	def bomberman_on_portal(self, position):
+		""" Retourne vrai si le bomberman caractérisé par 'position' se trouve sur le portail de sortie. Retourne faux sinon.
+			Paramètres:
+				'position':
+					<Position>
+					la position du bomberman dans le labyrinthe
+			Valeur de retour:
+				<booléen>
+				vrai si bomberman  est sur le portail, faux sinon
+		"""
 		return self.grid[position.y][position.x] == Unit.PORTAL
 
 	def check_powerups(self, position):
+		""" Retourne un entier caractérisant le bonnus sur lequel le bomberman se trouve.
+			Paramètres:
+				'position':
+					<Position>
+					la position du bomberman dans le labyrinthe
+			Valeur de retour:
+				<entier>
+				un entier caractérisant quel bonnus doit être augmenté
+		"""
 		if self.grid[position.y][position.x] == Unit.BOMB_POWERUP:
 			self.grid[position.y][position.x] = Unit.GROUND
 			return BOMB_UP
@@ -562,6 +586,9 @@ class Labyrinth:
 				'window':
 					<pygame.Surface>
 					la fenetre courante
+				'size_unit':
+					<nombre>
+					la taille en pixel d'une unité de surface
 		"""
 		for j in range(Y_MIN, Y_MAX):
 			for i in range(X_MIN, X_MAX):

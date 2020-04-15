@@ -60,6 +60,12 @@ class Bomberman(Character):
 		return self.position
 
 	def skill_up(self, powerups):
+		""" Augmente les compétences du bomberman de 1 unité selon la compétence caractérisé par 'powerups'.
+			Paramètres:
+				'powerups':
+					<nombre>
+					une caractérisation du pouvoir à augmenter
+		"""
 		if powerups == BOMB_UP:
 			self.skill.bomb_amount = (self.skill.bomb_amount + 1) % 10
 		elif powerups == FLAME_UP:
@@ -71,6 +77,9 @@ class Bomberman(Character):
 				'window':
 					<pygame.Surface>
 					la fenetre courante
+				'size_unit':
+					<nombre>
+					la taille en pixel d'une unité de surface
 		"""
 		if self.direction == Direction.RIGHT:
 			window.blit(pygame.transform.scale(self.right[self.move_index], (size_unit, 2*size_unit)), (self.position.x*size_unit, (self.position.y-1)*size_unit))
