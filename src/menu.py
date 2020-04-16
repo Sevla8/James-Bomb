@@ -7,15 +7,27 @@ from random import randrange
 import pygame
 import pygameMenu
 import game
+import multigame
 from constants import *
 
 clock = None
 main_menu = None
 surface = None
 
+difficulty = [MEDIUM]
+
 def main_background():
 	global surface
 	surface.fill(COLOR_BACKGROUND)
+
+def play_battle():
+	game.play(adventure = False)
+
+def play_adventue():
+	game.play(adventure = True)
+
+def change_difficulty(value, difficulty_level):
+	difficulty[0] = difficulty_level
 
 def principal_menu() :
 	global clock
@@ -29,57 +41,93 @@ def principal_menu() :
 	pygame.display.set_caption('James Bomb')
 	clock = pygame.time.Clock()
 
-	adventure_option = pygameMenu.Menu(surface,
-										back_box=False,
-										bgfun=main_background,
-										color_selected=COLOR_WHITE,
-										font=pygameMenu.font.FONT_BEBAS,
-										font_color=COLOR_BLACK,
-										font_size=30,
-										font_size_title=40,
-										menu_alpha=100,
-										menu_color=COLOR_BACKGROUND,
-										menu_color_title=COLOR_BACKGROUND,
-										menu_height=int(WINDOW_SIZE[1] * 0.7),
-										menu_width=int(WINDOW_SIZE[0] * 0.7),
-										onclose=pygameMenu.events.DISABLE_CLOSE,
-										option_shadow=False,
-										title='Option d\'aventure',
-										window_height=WINDOW_SIZE[1],
-										window_width=WINDOW_SIZE[0],
-										mouse_enabled=True,
-										mouse_visible=True,
-										# title_offsetx=50
-										)
+	play_menu = pygameMenu.Menu(surface,
+								back_box=False,
+								bgfun=main_background,
+								color_selected=COLOR_WHITE,
+								font=pygameMenu.font.FONT_BEBAS,
+								font_color=COLOR_BLACK,
+								font_size=30,
+								font_size_title=40,
+								menu_alpha=100,
+								menu_color=COLOR_BACKGROUND,
+								menu_color_title=COLOR_BACKGROUND,
+								menu_height=int(WINDOW_SIZE[1] * 0.7),
+								menu_width=int(WINDOW_SIZE[0] * 0.7),
+								onclose=pygameMenu.events.DISABLE_CLOSE,
+								option_shadow=False,
+								title='Play Menu',
+								window_height=WINDOW_SIZE[1],
+								window_width=WINDOW_SIZE[0],
+								mouse_enabled=True,
+								mouse_visible=True,
+								# title_offsetx=50
+								)
 
-	adventure_option.add_option('Play', game.adventure)
-	adventure_option.add_option('Back', pygameMenu.events.BACK)
+	play_menu.add_option('Battle', play_battle)
+	play_menu.add_option('Adventure', play_adventue)
+	play_menu.add_option('Multiplayer', multigame.play)
+	play_menu.add_button('Back', pygameMenu.events.BACK)
 
-	play_adventure_menu = pygameMenu.Menu(surface,
-											back_box=False,
-											bgfun=main_background,
-											color_selected=COLOR_WHITE,
-											font=pygameMenu.font.FONT_BEBAS,
-											font_color=COLOR_BLACK,
-											font_size=30,
-											menu_alpha=100,
-											menu_color=COLOR_BACKGROUND,
-											menu_color_title=COLOR_BACKGROUND,
-											menu_height=int(WINDOW_SIZE[1] * 0.7),
-											menu_width=int(WINDOW_SIZE[0] * 0.7),
-											onclose=pygameMenu.events.DISABLE_CLOSE,
-											option_shadow=False,
-											title='Mode Aventure',
-											window_height=WINDOW_SIZE[1],
-											window_width=WINDOW_SIZE[0],
-											mouse_enabled=True,
-											mouse_visible=True,
-											# title_offsetx=50
-											)
+	option_menu = pygameMenu.Menu(surface,
+								  back_box=False,
+								  bgfun=main_background,
+								  color_selected=COLOR_WHITE,
+								  font=pygameMenu.font.FONT_BEBAS,
+								  font_color=COLOR_BLACK,
+								  font_size=30,
+								  font_size_title=40,
+								  menu_alpha=100,
+								  menu_color=COLOR_BACKGROUND,
+								  menu_color_title=COLOR_BACKGROUND,
+								  menu_height=int(WINDOW_SIZE[1] * 0.7),
+								  menu_width=int(WINDOW_SIZE[0] * 0.7),
+								  onclose=pygameMenu.events.DISABLE_CLOSE,
+								  option_shadow=False,
+								  title='Option Menu',
+								  window_height=WINDOW_SIZE[1],
+								  window_width=WINDOW_SIZE[0],
+								  mouse_enabled=True,
+								  mouse_visible=True,
+								  # title_offsetx=50
+								  )
 
-	play_adventure_menu.add_option('1 Player', adventure_option)
-	play_adventure_menu.add_option('2 Player', adventure_option)
-	play_adventure_menu.add_option('Back', pygameMenu.events.BACK)
+	option_menu.add_selector('Select       difficulty       ',
+							 [('Easy', EASY), ('Medium', MEDIUM), ('Hard', HARD)],
+							 onchange=change_difficulty,
+							 selector_id='select_difficulty')
+	option_menu.add_button('Back', pygameMenu.events.BACK)
+
+	help_menu = pygameMenu.TextMenu(surface,
+								back_box=False,
+								bgfun=main_background,
+								color_selected=COLOR_WHITE,
+								font=pygameMenu.font.FONT_BEBAS,
+								font_color=COLOR_BLACK,
+								font_size=30,
+								menu_alpha=100,
+								menu_color=COLOR_BACKGROUND,
+								menu_color_title=COLOR_BACKGROUND,
+								menu_height=int(WINDOW_SIZE[1] * 0.7),
+								menu_width=int(WINDOW_SIZE[0] * 0.7),
+								onclose=pygameMenu.events.DISABLE_CLOSE,
+								option_shadow=False,
+								title='Help Menu',
+								window_height=WINDOW_SIZE[1],
+								window_width=WINDOW_SIZE[0],
+								mouse_enabled=True,
+								mouse_visible=True,
+								# title_offsetx=50
+								)
+
+	help_menu.add_line('Rightwards       Arrow       :       Move       Right')
+	help_menu.add_line('Leftwards       Arrow       :       Move       Left')
+	help_menu.add_line('Upwards       Arrow       :       Move       Up')
+	help_menu.add_line('Downwards       Arrow       :       Move       Down')
+	help_menu.add_line(pygameMenu.locals.TEXT_NEWLINE)
+	help_menu.add_line('Space       :       Drop       Bomb')
+	help_menu.add_line('Escape       :       Pause       Menu')
+	help_menu.add_button('Back', pygameMenu.events.BACK)
 
 	main_menu = pygameMenu.Menu(surface,
 								back_box=False,
@@ -97,7 +145,7 @@ def principal_menu() :
 								onclose=pygameMenu.events.DISABLE_CLOSE,
 								# option_margin=25,
 								option_shadow=False,
-								title='Menu Principal',
+								title='Main Menu',
 								window_height=WINDOW_SIZE[1],
 								window_width=WINDOW_SIZE[0],
 								mouse_enabled=True,
@@ -106,8 +154,9 @@ def principal_menu() :
 								# title_offsety=-50
 								)
 
-	main_menu.add_option('Play Local', play_adventure_menu)
-	main_menu.add_option('Option', play_adventure_menu)
+	main_menu.add_option('Play', play_menu)
+	main_menu.add_option('Option', option_menu)
+	main_menu.add_option('Help', help_menu)
 	main_menu.add_option('Quit', pygameMenu.events.EXIT)
 
 	main_menu.set_fps(FPS)

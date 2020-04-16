@@ -15,7 +15,7 @@ window = None
 def pause_background():
 	pass
 
-def adventure():
+def play(adventure):
 	global window
 	global pause_menu
 
