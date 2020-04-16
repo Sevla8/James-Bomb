@@ -30,6 +30,30 @@ class Labyrinth:
 		for i in range(DEFAULT_CREEP_AMOUNT):
 			self.creeps.append(Creep())
 
+	def generate(self):
+		""" Génére un labyrinthe dont les composants seront disposés de manière aléatoire. Certains composants ont cependant une disposition prédéfinie et constante.
+		"""
+		for j in range(Y_MIN, Y_MAX):
+			for i in range(X_MIN, X_MAX):
+				if self.grid[j][i] != Unit.BLOCK:
+					if j == BOMBERMAN_INITIAL_POSITION_Y and i == BOMBERMAN_INITIAL_POSITION_X or j == BOMBERMAN_INITIAL_POSITION_Y+1 and i == BOMBERMAN_INITIAL_POSITION_X or j == BOMBERMAN_INITIAL_POSITION_Y and i == BOMBERMAN_INITIAL_POSITION_X+1:
+						continue
+					if random.choice([True, False]):
+						if random.choice([True, False, False, False, False, False, False, False, False, False]):
+							self.grid[j][i] = Unit.BOMB_POWERUP_HIDDEN
+						elif random.choice([True, False, False, False, False, False, False, False, False]):
+							self.grid[j][i] = Unit.FLAME_POWERUP_HIDDEN
+						else:
+							self.grid[j][i] = Unit.BOX
+		portal_ok = False
+		while not portal_ok:
+			y = random.randint(Y_MIN, Y_MAX-1)
+			x = random.randint(X_MIN, X_MAX-1)
+			if self.grid[y][x] == Unit.BOX:
+				self.grid[y][x] = Unit.PORTAL_HIDDEN
+				portal_ok = True
+		self.generate_creeps()
+
 	def load(self, stage):
 		""" Charger un labyrinthe en fonction de l'avancement dans le jeu (caractérisé par 'stage').
 			Paramètres:
@@ -54,6 +78,35 @@ class Labyrinth:
 			for j in range(Y_MIN, Y_MAX):
 				for i in range(X_MIN, X_MAX):
 					self.grid[j][i] = Unit.GROUND if grid[j][i] == "ground" else Unit.BLOCK if grid[j][i] == "block" else Unit.BOX if grid[j][i] == "box" else Unit.PORTAL if grid[j][i] == "portal" else Unit.BOMB
+
+		except mysql.connector.Error as e:
+			print("Error while connecting to MySQL", e)
+
+		finally:
+			if (db.is_connected()):
+				cursor.close()
+				db.close()
+
+	def save(self):
+		""" Sauvegarde un labyrinthe. Pour le moment utilisé pour créer des labyrinthes dans la base de donnée. À terme servira à sauvegarder la progression du joueur.
+		"""
+		grid = [[Unit.GROUND] * Y_MAX for k in range(X_MAX)]
+		for j in range(Y_MIN, Y_MAX):
+			for i in range(X_MIN, X_MAX):
+				grid[j][i] = "ground" if self.grid[j][i] == Unit.GROUND else "block" if self.grid[j][i] == Unit.BLOCK else "box" if self.grid[j][i] == Unit.BOX else "portal" if self.grid[j][i] == Unit.PORTAL else "bomb"
+		json_grid = json.dumps(grid)
+
+		try:
+			db = mysql.connector.connect(host='localhost',
+										database='Bomberman',
+										user='root',
+										password='')
+
+			cursor = db.cursor()
+			query = "INSERT INTO Stages (id_stage, grid) VALUES (%s, %s)"
+			cursor.execute(query, (None, json_grid))
+			db.commit()
+			cursor.close()
 
 		except mysql.connector.Error as e:
 			print("Error while connecting to MySQL", e)
@@ -88,59 +141,6 @@ class Labyrinth:
 			if creep.position.y == position.y and creep.position.x == position.x:
 				return True
 		return False
-
-	def generate(self):
-		""" Génére un labyrinthe dont les composants seront disposés de manière aléatoire. Certains composants ont cependant une disposition prédéfinie et constante.
-		"""
-		for j in range(Y_MIN, Y_MAX):
-			for i in range(X_MIN, X_MAX):
-				if self.grid[j][i] != Unit.BLOCK:
-					if j == BOMBERMAN_INITIAL_POSITION_Y and i == BOMBERMAN_INITIAL_POSITION_X or j == BOMBERMAN_INITIAL_POSITION_Y+1 and i == BOMBERMAN_INITIAL_POSITION_X or j == BOMBERMAN_INITIAL_POSITION_Y and i == BOMBERMAN_INITIAL_POSITION_X+1:
-						continue
-					if random.choice([True, False]):
-						if random.choice([True, False, False, False, False, False, False, False, False, False]):
-							self.grid[j][i] = Unit.BOMB_POWERUP_HIDDEN
-						elif random.choice([True, False, False, False, False, False, False, False, False]):
-							self.grid[j][i] = Unit.FLAME_POWERUP_HIDDEN
-						else:
-							self.grid[j][i] = Unit.BOX
-		portal_ok = False
-		while not portal_ok:
-			y = random.randint(Y_MIN, Y_MAX-1)
-			x = random.randint(X_MIN, X_MAX-1)
-			if self.grid[y][x] == Unit.BOX:
-				self.grid[y][x] = Unit.PORTAL_HIDDEN
-				portal_ok = True
-		self.generate_creeps()
-
-	def save(self):
-		""" Sauvegarde un labyrinthe. Pour le moment utilisé pour créer des labyrinthes dans la base de donnée. À terme servira à sauvegarder la progression du joueur.
-		"""
-		grid = [[Unit.GROUND] * Y_MAX for k in range(X_MAX)]
-		for j in range(Y_MIN, Y_MAX):
-			for i in range(X_MIN, X_MAX):
-				grid[j][i] = "ground" if self.grid[j][i] == Unit.GROUND else "block" if self.grid[j][i] == Unit.BLOCK else "box" if self.grid[j][i] == Unit.BOX else "portal" if self.grid[j][i] == Unit.PORTAL else "bomb"
-		json_grid = json.dumps(grid)
-
-		try:
-			db = mysql.connector.connect(host='localhost',
-										database='Bomberman',
-										user='root',
-										password='')
-
-			cursor = db.cursor()
-			query = "INSERT INTO Stages (id_stage, grid) VALUES (%s, %s)"
-			cursor.execute(query, (None, json_grid))
-			db.commit()
-			cursor.close()
-
-		except mysql.connector.Error as e:
-			print("Error while connecting to MySQL", e)
-
-		finally:
-			if (db.is_connected()):
-				cursor.close()
-				db.close()
 
 	def valid_move(self, position, direction):
 		""" Retourne vrai si le mouvement caractérisé par 'position' et 'direction' est valide. Retourne faux sinon.

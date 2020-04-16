@@ -14,20 +14,15 @@ clock = None
 main_menu = None
 surface = None
 
-difficulty = [MEDIUM]
+difficulty = MEDIUM
 
 def main_background():
 	global surface
 	surface.fill(COLOR_BACKGROUND)
 
-def play_battle():
-	game.play(adventure = False)
-
-def play_adventue():
-	game.play(adventure = True)
-
 def change_difficulty(value, difficulty_level):
-	difficulty[0] = difficulty_level
+	global difficulty
+	difficulty = difficulty_level
 
 def principal_menu() :
 	global clock
@@ -64,9 +59,9 @@ def principal_menu() :
 								# title_offsetx=50
 								)
 
-	play_menu.add_option('Battle', play_battle)
-	play_menu.add_option('Adventure', play_adventue)
-	play_menu.add_option('Multiplayer', multigame.play)
+	play_menu.add_option('Battle', game.battle)
+	play_menu.add_option('Adventure', game.adventure)
+	play_menu.add_option('Multiplayer', game.multiplayer)
 	play_menu.add_button('Back', pygameMenu.events.BACK)
 
 	option_menu = pygameMenu.Menu(surface,
