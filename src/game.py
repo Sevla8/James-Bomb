@@ -225,7 +225,7 @@ def adventure(user_name):
 		stage += 1
 		new_progression(username, stage)
 
-	while stage != 2:
+	while stage <= 10:
 
 		labyrinth = Labyrinth()
 		labyrinth.load(stage)
