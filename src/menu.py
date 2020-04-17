@@ -12,7 +12,7 @@ from constants import *
 clock = None
 main_menu = None
 surface = None
-sound = None
+sound = True
 difficulty = MEDIUM
 username = 'ANONYMOUS'
 
@@ -31,28 +31,43 @@ def update_name(value):
 	print('User name: {0}'.format(value))
 
 def update_sound(value, enabled):
-    global main_menu
-    global sound
-    if enabled:
-        main_menu.set_sound(sound, recursive=True)
-        print('Menu sounds were enabled')
-    else:
-        main_menu.set_sound(None, recursive=True)
-        print('Menu sounds were disabled')
+	global main_menu
+	global sound
+	if enabled:
+		pygame.mixer.music.play(-1)
+		sound = True
+		print('Menu sounds were enabled')
+	else:
+		pygame.mixer.music.stop()
+		sound = False
+		print('Menu sounds were disabled')
+
+def launch_battle():
+	global sound
+	pygame.mixer.music.stop()
+	game.battle(sound)
 
 def launch_adventure():
 	global username
+	global sound
+	pygame.mixer.music.stop()
 	if username == '':
 		username = 'ANONYMOUS'
-	game.adventure(username)
+	game.adventure(username, sound)
+
+def launch_multiplayer():
+	global sound
+	pygame.mixer.music.stop()
+	game.multiplayer(sound)
 
 def principal_menu() :
 	global clock
 	global main_menu
 	global surface
+	global sound
 
-	pygame.init()
-	#os.environ['SDL_VIDEO_CENTERED'] = '1'
+	pygame.mixer.music.load(MENU_SOUND)
+	pygame.mixer.music.play(-1)
 
 	surface = pygame.display.set_mode(WINDOW_SIZE)
 	pygame.display.set_caption('James Bomb')
@@ -81,9 +96,9 @@ def principal_menu() :
 								# title_offsetx=50
 								)
 
-	play_menu.add_option('Battle', game.battle)
+	play_menu.add_option('Battle', launch_battle)
 	play_menu.add_option('Adventure', launch_adventure)
-	play_menu.add_option('Multiplayer', game.multiplayer)
+	play_menu.add_option('Multiplayer', launch_multiplayer)
 	play_menu.add_button('Back', pygameMenu.events.BACK)
 
 	option_menu = pygameMenu.Menu(surface,
@@ -109,15 +124,15 @@ def principal_menu() :
 								  # title_offsetx=50
 								  )
 
-	option_menu.add_text_input('Username :     ',
+	option_menu.add_text_input('Username : ',
 							   default='',
 							   onreturn=update_name,
 							   textinput_id='username')
-	option_menu.add_selector('Select difficulty :     ',
+	option_menu.add_selector('Select difficulty : ',
 							 [('Easy', EASY), ('Medium', MEDIUM), ('Hard', HARD)],
 							 onchange=update_difficulty)
-	option_menu.add_selector('Sound :     ',
-							 [('Off', False), ('On', True)],
+	option_menu.add_selector('Sound : ',
+							 [('On', True), ('Off', False)],
 							 onchange=update_sound)
 	option_menu.add_button('Back', pygameMenu.events.BACK)
 
@@ -143,13 +158,13 @@ def principal_menu() :
 								# title_offsetx=50
 								)
 
-	help_menu.add_line('Rightwards       Arrow       :       Move       Right')
-	help_menu.add_line('Leftwards       Arrow       :       Move       Left')
-	help_menu.add_line('Upwards       Arrow       :       Move       Up')
-	help_menu.add_line('Downwards       Arrow       :       Move       Down')
+	help_menu.add_line('Rightwards Arrow : Move Right')
+	help_menu.add_line('Leftwards Arrow : Move Left')
+	help_menu.add_line('Upwards Arrow : Move Up')
+	help_menu.add_line('Downwards Arrow : Move Down')
 	help_menu.add_line(pygameMenu.locals.TEXT_NEWLINE)
-	help_menu.add_line('Space       :       Drop       Bomb')
-	help_menu.add_line('Escape       :       Pause       Menu')
+	help_menu.add_line('Space : Drop Bomb')
+	help_menu.add_line('Escape : Pause Menu')
 	help_menu.add_button('Back', pygameMenu.events.BACK)
 
 	main_menu = pygameMenu.Menu(surface,

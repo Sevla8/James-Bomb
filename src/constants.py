@@ -133,3 +133,5 @@ EVENT_BOMB_EXPLOSE_6_2 = -17
 EVENT_BOMB_EXPLOSE_7_2 = -18
 EVENT_BOMB_EXPLOSE_8_2 = -19
 EVENT_BOMB_EXPLOSE_9_2 = -20
+MENU_SOUND = 'sounds/title.mp3'
+GAME_SOUND = 'sounds/bomberman-main-theme.ogg'

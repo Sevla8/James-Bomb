@@ -6,5 +6,5 @@ import sys
 from menu import *
 
 pygame.init()
-
+pygame.mixer.init()
 principal_menu()

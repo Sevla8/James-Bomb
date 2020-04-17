@@ -14,6 +14,7 @@ pause_menu = None
 window = None
 username = None
 stage = None
+sound = None
 
 def load_progression(username):
 	try:
@@ -92,9 +93,16 @@ def save_and_quit():
 def pause_background():
 	pass
 
-def battle():
+def battle(sound_option):
 	global window
 	global pause_menu
+	global sound
+
+	sound = sound_option
+
+	if sound:
+		pygame.mixer.music.load(GAME_SOUND)
+		pygame.mixer.music.play(-1)
 
 	window = pygame.display.set_mode(WINDOW_SIZE, pygame.RESIZABLE)
 	pygame.display.set_caption(WINDOW_CAPTION)
@@ -199,11 +207,21 @@ def battle():
 		pause_menu.mainloop(event, disable_loop=False)
 		pygame.display.flip()
 
-def adventure(user_name):
+	if sound:
+		pygame.mixer.music.stop()
+
+def adventure(user_name, sound_option):
 	global window
 	global pause_menu
 	global username
 	global stage
+	global sound
+
+	sound = sound_option
+
+	if sound:
+		pygame.mixer.music.load(GAME_SOUND)
+		pygame.mixer.music.play(-1)
 
 	username = user_name
 
@@ -330,9 +348,19 @@ def adventure(user_name):
 			pause_menu.mainloop(event, disable_loop=False)
 			pygame.display.flip()
 
-def multiplayer():
+	if sound:
+		pygame.mixer.music.stop()
+
+def multiplayer(sound_option):
 	global window
 	global pause_menu
+	global sound
+
+	sound = sound_option
+
+	if sound:
+		pygame.mixer.music.load(GAME_SOUND)
+		pygame.mixer.music.play(-1)
 
 	window = pygame.display.set_mode(WINDOW_SIZE, pygame.RESIZABLE)
 	pygame.display.set_caption(WINDOW_CAPTION)
@@ -481,3 +509,5 @@ def multiplayer():
 		pause_menu.mainloop(event, disable_loop=False)
 		pygame.display.flip()
 
+	if sound:
+		pygame.mixer.music.stop()
