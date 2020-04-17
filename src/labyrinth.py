@@ -11,7 +11,7 @@ from direction import *
 from creep import *
 
 class Labyrinth:
-	def __init__(self):
+	def __init__(self, multiplayer = False):
 		""" Construit un labyrinthe.
 		"""
 		self.ground = pygame.image.load(UNIT_GROUND)
@@ -27,8 +27,10 @@ class Labyrinth:
 				if j == Y_MIN or j == Y_MAX-1 or i == X_MIN or i == X_MAX-1 or j % 2 == 0 and i % 2 == 0:
 					self.grid[j][i] = Unit.BLOCK
 		self.creeps = []
-		for i in range(DEFAULT_CREEP_AMOUNT):
-			self.creeps.append(Creep())
+		if not multiplayer:
+			for i in range(DEFAULT_CREEP_AMOUNT):
+				self.creeps.append(Creep())
+		self.multiplayer = multiplayer
 
 	def generate(self):
 		""" Génére un labyrinthe dont les composants seront disposés de manière aléatoire. Certains composants ont cependant une disposition prédéfinie et constante.
@@ -38,6 +40,8 @@ class Labyrinth:
 				if self.grid[j][i] != Unit.BLOCK:
 					if j == BOMBERMAN_INITIAL_POSITION_Y and i == BOMBERMAN_INITIAL_POSITION_X or j == BOMBERMAN_INITIAL_POSITION_Y+1 and i == BOMBERMAN_INITIAL_POSITION_X or j == BOMBERMAN_INITIAL_POSITION_Y and i == BOMBERMAN_INITIAL_POSITION_X+1:
 						continue
+					if self.multiplayer and j == BOMBERMAN_INITIAL_POSITION_Y_2 and i == BOMBERMAN_INITIAL_POSITION_X_2 or j == BOMBERMAN_INITIAL_POSITION_Y_2-1 and i == BOMBERMAN_INITIAL_POSITION_X_2 or j == BOMBERMAN_INITIAL_POSITION_Y_2 and i == BOMBERMAN_INITIAL_POSITION_X_2-1:
+						continue
 					if random.choice([True, False]):
 						if random.choice([True, False, False, False, False, False, False, False, False, False]):
 							self.grid[j][i] = Unit.BOMB_POWERUP_HIDDEN
@@ -45,14 +49,16 @@ class Labyrinth:
 							self.grid[j][i] = Unit.FLAME_POWERUP_HIDDEN
 						else:
 							self.grid[j][i] = Unit.BOX
-		portal_ok = False
-		while not portal_ok:
-			y = random.randint(Y_MIN, Y_MAX-1)
-			x = random.randint(X_MIN, X_MAX-1)
-			if self.grid[y][x] == Unit.BOX:
-				self.grid[y][x] = Unit.PORTAL_HIDDEN
-				portal_ok = True
-		self.generate_creeps()
+		if not self.multiplayer:
+			portal_ok = False
+			while not portal_ok:
+				y = random.randint(Y_MIN, Y_MAX-1)
+				x = random.randint(X_MIN, X_MAX-1)
+				if self.grid[y][x] == Unit.BOX:
+					self.grid[y][x] = Unit.PORTAL_HIDDEN
+					portal_ok = True
+		if not self.multiplayer:
+			self.generate_creeps()
 
 	def load(self, stage):
 		""" Charger un labyrinthe en fonction de l'avancement dans le jeu (caractérisé par 'stage').

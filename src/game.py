@@ -109,7 +109,6 @@ def battle():
 	pygame.time.set_timer(pygame.USEREVENT + EVENT_BOMB_TIMEOUT, HALF_SECOND)
 	pygame.time.set_timer(pygame.USEREVENT + EVENT_FLAME_BURN, TWENTIETH_SECOND)
 	event_bomb_explose = [EVENT_BOMB_EXPLOSE_0, EVENT_BOMB_EXPLOSE_1, EVENT_BOMB_EXPLOSE_2, EVENT_BOMB_EXPLOSE_3, EVENT_BOMB_EXPLOSE_4, EVENT_BOMB_EXPLOSE_5, EVENT_BOMB_EXPLOSE_6, EVENT_BOMB_EXPLOSE_7, EVENT_BOMB_EXPLOSE_8, EVENT_BOMB_EXPLOSE_9]
-	event_bomb_explose_active = [False] * 10
 	current_bomb_index = 0
 
 	# Main menu, pauses execution of the application
@@ -178,15 +177,10 @@ def battle():
 					bomberman.skill_up(powerups)
 					loop = not labyrinth.bomberman_on_portal(bomberman.get_position())
 			elif event.key == pygame.K_SPACE:
-				if labyrinth.can_drop_bomb(bomberman.position) and bomberman.can_drop_bomb():
+				if labyrinth.can_drop_bomb(bomberman.get_position()) and bomberman.can_drop_bomb():
 					bomberman.drop_bomb()
 					labyrinth.drop_bomb(bomberman.get_position())
-					for k in range(0, MAX_BOMB_AMOUNT):
-						if event_bomb_explose_active[k]:
-							pygame.time.set_timer(pygame.USEREVENT + event_bomb_explose[k], 0)
-							pygame.time.set_timer(pygame.USEREVENT + event_bomb_explose[k], 3*HALF_SECOND)
 					pygame.time.set_timer(pygame.USEREVENT + event_bomb_explose[current_bomb_index], 3*HALF_SECOND)
-					event_bomb_explose_active[current_bomb_index] = True
 					current_bomb_index = (current_bomb_index + 1) % MAX_BOMB_AMOUNT
 		elif event.type >= pygame.NOEVENT and event.type <= pygame.NUMEVENTS:
 			if event.type == pygame.USEREVENT + EVENT_MOVE_CREEPS:
@@ -196,10 +190,9 @@ def battle():
 				labyrinth.bomb_explose(bomberman.get_scope())
 			if event.type == pygame.USEREVENT + EVENT_FLAME_BURN:
 				loop = not labyrinth.burn(bomberman.get_position())
-			for k in range(0, MAX_BOMB_AMOUNT):	# bug
+			for k in range(0, MAX_BOMB_AMOUNT):
 				if event.type == pygame.USEREVENT + event_bomb_explose[k]:
 					pygame.time.set_timer(pygame.USEREVENT + event_bomb_explose[k], 0)
-					event_bomb_explose_active[k] = False
 					bomberman.bomb_explose()
 		labyrinth.print(window, size_unit)
 		bomberman.print(window, size_unit)
@@ -235,7 +228,6 @@ def adventure(user_name):
 		pygame.time.set_timer(pygame.USEREVENT + EVENT_BOMB_TIMEOUT, HALF_SECOND)
 		pygame.time.set_timer(pygame.USEREVENT + EVENT_FLAME_BURN, TWENTIETH_SECOND)
 		event_bomb_explose = [EVENT_BOMB_EXPLOSE_0, EVENT_BOMB_EXPLOSE_1, EVENT_BOMB_EXPLOSE_2, EVENT_BOMB_EXPLOSE_3, EVENT_BOMB_EXPLOSE_4, EVENT_BOMB_EXPLOSE_5, EVENT_BOMB_EXPLOSE_6, EVENT_BOMB_EXPLOSE_7, EVENT_BOMB_EXPLOSE_8, EVENT_BOMB_EXPLOSE_9]
-		event_bomb_explose_active = [False] * 10
 		current_bomb_index = 0
 
 		# Main menu, pauses execution of the application
@@ -316,15 +308,10 @@ def adventure(user_name):
 							stage += 1
 							save_progression(username, stage)
 				elif event.key == pygame.K_SPACE:
-					if labyrinth.can_drop_bomb(bomberman.position) and bomberman.can_drop_bomb():
+					if labyrinth.can_drop_bomb(bomberman.get_position()) and bomberman.can_drop_bomb():
 						bomberman.drop_bomb()
 						labyrinth.drop_bomb(bomberman.get_position())
-						for k in range(0, MAX_BOMB_AMOUNT):
-							if event_bomb_explose_active[k]:
-								pygame.time.set_timer(pygame.USEREVENT + event_bomb_explose[k], 0)
-								pygame.time.set_timer(pygame.USEREVENT + event_bomb_explose[k], 3*HALF_SECOND)
 						pygame.time.set_timer(pygame.USEREVENT + event_bomb_explose[current_bomb_index], 3*HALF_SECOND)
-						event_bomb_explose_active[current_bomb_index] = True
 						current_bomb_index = (current_bomb_index + 1) % MAX_BOMB_AMOUNT
 			elif event.type >= pygame.NOEVENT and event.type <= pygame.NUMEVENTS:
 				if event.type == pygame.USEREVENT + EVENT_MOVE_CREEPS:
@@ -337,7 +324,6 @@ def adventure(user_name):
 				for k in range(0, MAX_BOMB_AMOUNT):	# bug
 					if event.type == pygame.USEREVENT + event_bomb_explose[k]:
 						pygame.time.set_timer(pygame.USEREVENT + event_bomb_explose[k], 0)
-						event_bomb_explose_active[k] = False
 						bomberman.bomb_explose()
 			labyrinth.print(window, size_unit)
 			bomberman.print(window, size_unit)
@@ -345,4 +331,153 @@ def adventure(user_name):
 			pygame.display.flip()
 
 def multiplayer():
-	pass
+	global window
+	global pause_menu
+
+	window = pygame.display.set_mode(WINDOW_SIZE, pygame.RESIZABLE)
+	pygame.display.set_caption(WINDOW_CAPTION)
+	pygame.key.set_repeat(1, int(SECOND/3))
+	size_unit = DEFAULT_SIZE_UNIT
+
+	labyrinth = Labyrinth(multiplayer = True)
+	labyrinth.generate()
+	bomberman_1 = Bomberman()
+	bomberman_2 = Bomberman(Position(BOMBERMAN_INITIAL_POSITION_X_2, BOMBERMAN_INITIAL_POSITION_Y_2))
+
+	pygame.time.set_timer(pygame.USEREVENT + EVENT_BOMB_TIMEOUT, HALF_SECOND)
+	pygame.time.set_timer(pygame.USEREVENT + EVENT_FLAME_BURN, TWENTIETH_SECOND)
+	event_bomb_explose = [EVENT_BOMB_EXPLOSE_0, EVENT_BOMB_EXPLOSE_1, EVENT_BOMB_EXPLOSE_2, EVENT_BOMB_EXPLOSE_3, EVENT_BOMB_EXPLOSE_4, EVENT_BOMB_EXPLOSE_5, EVENT_BOMB_EXPLOSE_6, EVENT_BOMB_EXPLOSE_7, EVENT_BOMB_EXPLOSE_8, EVENT_BOMB_EXPLOSE_9]
+	event_bomb_explose_2 = [EVENT_BOMB_EXPLOSE_0_2, EVENT_BOMB_EXPLOSE_1_2, EVENT_BOMB_EXPLOSE_2_2, EVENT_BOMB_EXPLOSE_3_2, EVENT_BOMB_EXPLOSE_4_2, EVENT_BOMB_EXPLOSE_5_2, EVENT_BOMB_EXPLOSE_6_2, EVENT_BOMB_EXPLOSE_7_2, EVENT_BOMB_EXPLOSE_8_2, EVENT_BOMB_EXPLOSE_9_2]
+	current_bomb_index = 0
+	current_bomb_index_2 = 0
+
+	# Main menu, pauses execution of the application
+	pause_menu = pygameMenu.Menu(window,
+								 back_box=False,
+								 bgfun=pause_background,
+								 enabled=False,
+								 font=pygameMenu.font.FONT_BEBAS,
+								 font_color=COLOR_BLACK,
+								 menu_alpha=90,
+								 menu_color=COLOR_BACKGROUND,
+								 fps=FPS,
+								 onclose=pygameMenu.events.CLOSE,
+								 title='Pause Menu',
+								 option_shadow=False,
+								 title_offsety=5,
+								 window_height=WINDOW_SIZE[1],
+								 window_width=WINDOW_SIZE[0],
+								 mouse_enabled=True,
+								 mouse_visible=True)
+
+	pause_menu.add_option('Resume', pygameMenu.events.CLOSE)
+	pause_menu.add_option('Quit', menu.principal_menu)
+
+	loop = True
+	while loop:
+		event = pygame.event.wait()
+		# if event.type == pygame.VIDEORESIZE:	# bug
+		# 	size_unit = min(int(event.w / 15), int(event.h / 15))
+		# 	window = pygame.display.set_mode((event.w, event.h), pygame.RESIZABLE)
+		if event.type == pygame.QUIT:
+			exit()
+		elif event.type == pygame.KEYDOWN:
+			if event.key == pygame.K_ESCAPE:
+				pause_menu.enable()
+			elif event.key == pygame.K_d:
+				bomberman_1.turn(Direction.RIGHT)
+				bomberman_1.update_move_index()
+				if labyrinth.valid_move(bomberman_1.position, Direction.RIGHT):
+					bomberman_1.move(Direction.RIGHT)
+					powerups = labyrinth.check_powerups(bomberman_1.get_position())
+					bomberman_1.skill_up(powerups)
+					loop = not labyrinth.bomberman_on_portal(bomberman_1.get_position())
+			elif event.key == pygame.K_a:
+				bomberman_1.turn(Direction.LEFT)
+				bomberman_1.update_move_index()
+				if labyrinth.valid_move(bomberman_1.position, Direction.LEFT):
+					bomberman_1.move(Direction.LEFT)
+					powerups = labyrinth.check_powerups(bomberman_1.get_position())
+					bomberman_1.skill_up(powerups)
+					loop = not labyrinth.bomberman_on_portal(bomberman_1.get_position())
+			elif event.key == pygame.K_w:
+				bomberman_1.turn(Direction.UP)
+				bomberman_1.update_move_index()
+				if labyrinth.valid_move(bomberman_1.position, Direction.UP):
+					bomberman_1.move(Direction.UP)
+					powerups = labyrinth.check_powerups(bomberman_1.get_position())
+					bomberman_1.skill_up(powerups)
+					loop = not labyrinth.bomberman_on_portal(bomberman_1.get_position())
+			elif event.key == pygame.K_s:
+				bomberman_1.turn(Direction.DOWN)
+				bomberman_1.update_move_index()
+				if labyrinth.valid_move(bomberman_1.position, Direction.DOWN):
+					bomberman_1.move(Direction.DOWN)
+					powerups = labyrinth.check_powerups(bomberman_1.get_position())
+					bomberman_1.skill_up(powerups)
+					loop = not labyrinth.bomberman_on_portal(bomberman_1.get_position())
+			elif event.key == pygame.K_x:
+				if labyrinth.can_drop_bomb(bomberman_1.get_position()) and bomberman_1.can_drop_bomb():
+					bomberman_1.drop_bomb()
+					labyrinth.drop_bomb(bomberman_1.get_position())
+					pygame.time.set_timer(pygame.USEREVENT + event_bomb_explose[current_bomb_index], 3*HALF_SECOND)
+					current_bomb_index = (current_bomb_index + 1) % MAX_BOMB_AMOUNT
+			elif event.key == pygame.K_l:
+				bomberman_2.turn(Direction.RIGHT)
+				bomberman_2.update_move_index()
+				if labyrinth.valid_move(bomberman_2.position, Direction.RIGHT):
+					bomberman_2.move(Direction.RIGHT)
+					powerups = labyrinth.check_powerups(bomberman_2.get_position())
+					bomberman_2.skill_up(powerups)
+					loop = not labyrinth.bomberman_on_portal(bomberman_2.get_position())
+			elif event.key == pygame.K_j:
+				bomberman_2.turn(Direction.LEFT)
+				bomberman_2.update_move_index()
+				if labyrinth.valid_move(bomberman_2.position, Direction.LEFT):
+					bomberman_2.move(Direction.LEFT)
+					powerups = labyrinth.check_powerups(bomberman_2.get_position())
+					bomberman_2.skill_up(powerups)
+					loop = not labyrinth.bomberman_on_portal(bomberman_2.get_position())
+			elif event.key == pygame.K_i:
+				bomberman_2.turn(Direction.UP)
+				bomberman_2.update_move_index()
+				if labyrinth.valid_move(bomberman_2.position, Direction.UP):
+					bomberman_2.move(Direction.UP)
+					powerups = labyrinth.check_powerups(bomberman_2.get_position())
+					bomberman_2.skill_up(powerups)
+					loop = not labyrinth.bomberman_on_portal(bomberman_2.get_position())
+			elif event.key == pygame.K_k:
+				bomberman_2.turn(Direction.DOWN)
+				bomberman_2.update_move_index()
+				if labyrinth.valid_move(bomberman_2.position, Direction.DOWN):
+					bomberman_2.move(Direction.DOWN)
+					powerups = labyrinth.check_powerups(bomberman_2.get_position())
+					bomberman_2.skill_up(powerups)
+					loop = not labyrinth.bomberman_on_portal(bomberman_2.get_position())
+			elif event.key == pygame.K_m:
+				if labyrinth.can_drop_bomb(bomberman_2.get_position()) and bomberman_2.can_drop_bomb():
+					bomberman_2.drop_bomb()
+					labyrinth.drop_bomb(bomberman_2.get_position())
+					pygame.time.set_timer(pygame.USEREVENT + event_bomb_explose_2[current_bomb_index_2], 3*HALF_SECOND)
+					current_bomb_index_2 = (current_bomb_index_2 + 1) % MAX_BOMB_AMOUNT
+		elif event.type >= pygame.NOEVENT and event.type <= pygame.NUMEVENTS:
+			if event.type == pygame.USEREVENT + EVENT_BOMB_TIMEOUT:
+				labyrinth.bomb_explose(bomberman_1.get_scope())
+				# labyrinth.bomb_explose(bomberman_2.get_scope())
+			if event.type == pygame.USEREVENT + EVENT_FLAME_BURN:
+				loop = not labyrinth.burn(bomberman_1.get_position())
+				loop = not labyrinth.burn(bomberman_2.get_position())
+			for k in range(0, MAX_BOMB_AMOUNT):
+				if event.type == pygame.USEREVENT + event_bomb_explose[k]:
+					pygame.time.set_timer(pygame.USEREVENT + event_bomb_explose[k], 0)
+					bomberman_1.bomb_explose()
+			for k in range(0, MAX_BOMB_AMOUNT):
+				if event.type == pygame.USEREVENT + event_bomb_explose_2[k]:
+					pygame.time.set_timer(pygame.USEREVENT + event_bomb_explose_2[k], 0)
+					bomberman_2.bomb_explose()
+		labyrinth.print(window, size_unit)
+		bomberman_1.print(window, size_unit)
+		bomberman_2.print(window, size_unit)
+		pause_menu.mainloop(event, disable_loop=False)
+		pygame.display.flip()
+

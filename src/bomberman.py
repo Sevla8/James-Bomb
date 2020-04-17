@@ -10,7 +10,7 @@ from character import *
 from skill import *
 
 class Bomberman(Character):
-	def __init__(self):
+	def __init__(self, initial_position = Position(BOMBERMAN_INITIAL_POSITION_X, BOMBERMAN_INITIAL_POSITION_Y)):
 		""" Construit un Bomberman.
 		"""
 		self.right = [pygame.image.load(BOMBERMAN_RIGHT_0).convert_alpha(), pygame.image.load(BOMBERMAN_RIGHT_1).convert_alpha(), pygame.image.load(BOMBERMAN_RIGHT_2).convert_alpha(), pygame.image.load(BOMBERMAN_RIGHT_3).convert_alpha(), pygame.image.load(BOMBERMAN_RIGHT_4).convert_alpha(), pygame.image.load(BOMBERMAN_RIGHT_5).convert_alpha(), pygame.image.load(BOMBERMAN_RIGHT_6).convert_alpha(), pygame.image.load(BOMBERMAN_RIGHT_7).convert_alpha()]
@@ -19,7 +19,7 @@ class Bomberman(Character):
 		self.back = [pygame.image.load(BOMBERMAN_BACK_0).convert_alpha(), pygame.image.load(BOMBERMAN_BACK_1).convert_alpha(), pygame.image.load(BOMBERMAN_BACK_2).convert_alpha(), pygame.image.load(BOMBERMAN_BACK_3).convert_alpha(), pygame.image.load(BOMBERMAN_BACK_4).convert_alpha(), pygame.image.load(BOMBERMAN_BACK_5).convert_alpha(), pygame.image.load(BOMBERMAN_BACK_6).convert_alpha(), pygame.image.load(BOMBERMAN_BACK_7).convert_alpha()]
 		self.move_index = 0
 		self.move_max = BOMBERMAN_MOVE_MAX
-		self.position = Position(BOMBERMAN_INITIAL_POSITION_X, BOMBERMAN_INITIAL_POSITION_Y);
+		self.position = Position(initial_position.x, initial_position.y)
 		self.direction = Direction.DOWN
 		self.hp = DEFAULT_HP_BOMBERMAN
 		self.xp = DEFAULT_XP_BOMBERMAN
