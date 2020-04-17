@@ -7,22 +7,44 @@ from random import randrange
 import pygame
 import pygameMenu
 import game
-import multigame
 from constants import *
 
 clock = None
 main_menu = None
 surface = None
-
+sound = None
 difficulty = MEDIUM
+username = 'ANONYMOUS'
 
 def main_background():
 	global surface
 	surface.fill(COLOR_BACKGROUND)
 
-def change_difficulty(value, difficulty_level):
+def update_difficulty(value, level):
 	global difficulty
-	difficulty = difficulty_level
+	difficulty = level
+	print('Difficulty: {0}'.format(value))
+
+def update_name(value):
+	global username
+	username = value
+	print('User name: {0}'.format(value))
+
+def update_sound(value, enabled):
+    global main_menu
+    global sound
+    if enabled:
+        main_menu.set_sound(sound, recursive=True)
+        print('Menu sounds were enabled')
+    else:
+        main_menu.set_sound(None, recursive=True)
+        print('Menu sounds were disabled')
+
+def launch_adventure():
+	global username
+	if username == '':
+		username = 'ANONYMOUS'
+	game.adventure(username)
 
 def principal_menu() :
 	global clock
@@ -60,7 +82,7 @@ def principal_menu() :
 								)
 
 	play_menu.add_option('Battle', game.battle)
-	play_menu.add_option('Adventure', game.adventure)
+	play_menu.add_option('Adventure', launch_adventure)
 	play_menu.add_option('Multiplayer', game.multiplayer)
 	play_menu.add_button('Back', pygameMenu.events.BACK)
 
@@ -87,10 +109,16 @@ def principal_menu() :
 								  # title_offsetx=50
 								  )
 
-	option_menu.add_selector('Select       difficulty       ',
+	option_menu.add_text_input('Username :     ',
+							   default='',
+							   onreturn=update_name,
+							   textinput_id='username')
+	option_menu.add_selector('Select difficulty :     ',
 							 [('Easy', EASY), ('Medium', MEDIUM), ('Hard', HARD)],
-							 onchange=change_difficulty,
-							 selector_id='select_difficulty')
+							 onchange=update_difficulty)
+	option_menu.add_selector('Sound :     ',
+							 [('Off', False), ('On', True)],
+							 onchange=update_sound)
 	option_menu.add_button('Back', pygameMenu.events.BACK)
 
 	help_menu = pygameMenu.TextMenu(surface,

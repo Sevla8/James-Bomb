@@ -67,9 +67,9 @@ class Bomberman(Character):
 					une caractérisation du pouvoir à augmenter
 		"""
 		if powerups == BOMB_UP:
-			self.skill.bomb_amount = (self.skill.bomb_amount + 1) % 10
+			self.skill.bomb_amount = min(MAXIMAL_BOMB_AMOUNT, self.skill.bomb_amount + 1)
 		elif powerups == FLAME_UP:
-			self.skill.scope = (self.skill.scope + 1) % 10
+			self.skill.scope = min(MAXIMAL_FLAME_SCOPE, self.skill.scope + 1)
 
 	def print(self, window, size_unit):
 		""" Affiche le bomberman dans la fenêtre caractérisé par 'window'.

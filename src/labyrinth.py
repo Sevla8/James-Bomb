@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# import mysql.connector
+import mysql.connector
 import random
 import json
 import pygame
@@ -67,17 +67,23 @@ class Labyrinth:
 										user='root',
 										password='')
 			cursor = db.cursor()
-			query = "SELECT grid FROM Stages WHERE id_stage = %s"
+			query = "SELECT grid, creeps FROM Stages WHERE id_stage = %s"
 			cursor.execute(query, (stage,))
-			record = cursor.fetchone()[0]
+			record = cursor.fetchone()
 			cursor.close()
 
-			json_grid = record
-			#json_grid = record.decode("utf-8")
+			json_grid = record[0]
+			json_creeps = record[1]
+
 			grid = json.loads(json_grid)
 			for j in range(Y_MIN, Y_MAX):
 				for i in range(X_MIN, X_MAX):
-					self.grid[j][i] = Unit.GROUND if grid[j][i] == "ground" else Unit.BLOCK if grid[j][i] == "block" else Unit.BOX if grid[j][i] == "box" else Unit.PORTAL if grid[j][i] == "portal" else Unit.BOMB
+					self.grid[j][i] = Unit.GROUND if grid[j][i] == "ground" else Unit.BLOCK if grid[j][i] == "block" else Unit.BOX if grid[j][i] == "box" else Unit.PORTAL_HIDDEN if grid[j][i] == "portal_hidden" else Unit.FLAME_POWERUP_HIDDEN if grid[j][i] == "flame_powerup_hidden" else Unit.BOMB_POWERUP_HIDDEN
+
+			creeps = json.loads(json_creeps)
+			for k in range(0, len(creeps)):
+				self.creeps[k].position.x = creeps[k][0]
+				self.creeps[k].position.y = creeps[k][1]
 
 		except mysql.connector.Error as e:
 			print("Error while connecting to MySQL", e)
@@ -93,8 +99,13 @@ class Labyrinth:
 		grid = [[Unit.GROUND] * Y_MAX for k in range(X_MAX)]
 		for j in range(Y_MIN, Y_MAX):
 			for i in range(X_MIN, X_MAX):
-				grid[j][i] = "ground" if self.grid[j][i] == Unit.GROUND else "block" if self.grid[j][i] == Unit.BLOCK else "box" if self.grid[j][i] == Unit.BOX else "portal" if self.grid[j][i] == Unit.PORTAL else "bomb"
+				grid[j][i] = "ground" if self.grid[j][i] == Unit.GROUND else "block" if self.grid[j][i] == Unit.BLOCK else "box" if self.grid[j][i] == Unit.BOX else "portal_hidden" if self.grid[j][i] == Unit.PORTAL_HIDDEN else "flame_powerup_hidden" if self.grid[j][i] == Unit.FLAME_POWERUP_HIDDEN else "bomb_powerup_hidden"
 		json_grid = json.dumps(grid)
+
+		ennemies = []
+		for creep in self.creeps:
+			ennemies.append([creep.position.x, creep.position.y])
+		json_ennemies = json.dumps(ennemies)
 
 		try:
 			db = mysql.connector.connect(host='localhost',
@@ -103,8 +114,8 @@ class Labyrinth:
 										password='')
 
 			cursor = db.cursor()
-			query = "INSERT INTO Stages (id_stage, grid) VALUES (%s, %s)"
-			cursor.execute(query, (None, json_grid))
+			query = "INSERT INTO Stages (id_stage, grid, creeps) VALUES (%s, %s, %s)"
+			cursor.execute(query, (None, json_grid, json_ennemies))
 			db.commit()
 			cursor.close()
 
@@ -205,6 +216,10 @@ class Labyrinth:
 			# si le creep peut continuer tout droit alors il continue tout droit
 			if self.valid_move(creep.position, creep.direction) and not self.creep_collision(creep.position, creep.direction):
 				creep.move(creep.direction)
+				if self.grid[creep.position.y][creep.position.x] == Unit.BOMB_POWERUP:
+					self.grid[creep.position.y][creep.position.x] = Unit.GROUND
+				elif self.grid[creep.position.y][creep.position.x] == Unit.FLAME_POWERUP:
+					self.grid[creep.position.y][creep.position.x] = Unit.GROUND
 			# sinon on cherche une autre direction au hasard
 			else:
 				dead_end = False
