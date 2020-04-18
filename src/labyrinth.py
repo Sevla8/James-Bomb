@@ -246,6 +246,31 @@ class Labyrinth:
 						elif self.grid[creep.position.y][creep.position.x] == Unit.FLAME_POWERUP:
 							self.grid[creep.position.y][creep.position.x] = Unit.GROUND
 
+	def move_mechant(self, mechant):
+		if not mechant.get_alive:
+			return
+			
+		if self.valid_move(mechant.position, mechant.direction):
+			mechant.move(mechant.direction)
+			if self.grid[mechant.position.y][mechant.position.x] == Unit.BOMB_POWERUP:
+				self.grid[mechant.position.y][mechant.position.x] = Unit.GROUND
+			elif self.grid[mechant.position.y][mechant.position.x] == Unit.FLAME_POWERUP:
+				self.grid[mechant.position.y][mechant.position.x] = Unit.GROUND
+        # sinon on cherche une autre direction au hasard
+		else:
+			dead_end = False
+			if self.grid[mechant.position.y+1][mechant.position.x] <= Unit.PORTAL and self.grid[mechant.position.y-1][mechant.position.x] <= Unit.PORTAL and self.grid[mechant.position.y][mechant.position.x+1] <= Unit.PORTAL and self.grid[mechant.position.y][mechant.position.x-1] <= Unit.PORTAL:
+				dead_end = True
+			if not dead_end:
+				next_direction = random.choice([Direction.UP, Direction.LEFT, Direction.RIGHT, Direction.DOWN])
+				while not self.valid_move(mechant.position, next_direction):
+					next_direction = random.choice([Direction.UP, Direction.LEFT, Direction.RIGHT, Direction.DOWN])
+                # si collision le creep ne fait que se tourner
+				mechant.turn(next_direction)
+				mechant.move(next_direction)
+
+	
+
 	def can_drop_bomb(self, position):
 		""" Retourne vrai si une bombe peut être posée à l'emplacement caractérisé par 'position'. Retourne faux sinon.
 			Paramètres:
@@ -274,6 +299,7 @@ class Labyrinth:
 					<nombre>
 					la portée des bombes du bomberman
 		"""
+		#scope = bomberman.get_scope()
 		for j in range(Y_MIN, Y_MAX):
 			for i in range(X_MIN, X_MAX):
 				if self.grid[j][i] == Unit.BOMB_1:

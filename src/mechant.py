@@ -9,6 +9,8 @@ from position import *
 from character import *
 from bomberman import *
 from skill import *
+from bomb import *
+import random
 
 
 class Mechant(Bomberman):
@@ -16,6 +18,8 @@ class Mechant(Bomberman):
     def __init__(self, initial_position = Position(BOMBERMAN_INITIAL_POSITION_X, BOMBERMAN_INITIAL_POSITION_Y)):
         super(Mechant, self).__init__(initial_position)
         self.alive = True
+        self.direction = Direction.UP
+        self.bombs = [Bomb(self)] * MAXIMAL_BOMB_AMOUNT
 
     def touched(self,labyrinth):
         """
@@ -33,3 +37,16 @@ class Mechant(Bomberman):
 
     def get_alive(self):
         return self.alive
+
+    def bombs_active(self,labyrinth):
+        for bomb in list_bombs:
+            if bomb.get_active():
+                bomb.bomb_explose(labyrinth)
+
+    def drop_bomb(self,labyrinth):
+        if  self.alive and labyrinth.can_drop_bomb(self.position) and self.can_drop_bomb():
+            bomb = self.bombs[self.skill.droped_bomb_amount]        
+            bomb.droped(self.position,labyrinth)
+            #print("OUI")
+            return
+        #print("NON")

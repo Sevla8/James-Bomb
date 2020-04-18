@@ -356,12 +356,14 @@ def adventure(user_name, sound_option):
 		bomberman = Bomberman()
 		mechant = Mechant(Position(BOMBERMAN_INITIAL_POSITION_X_2, BOMBERMAN_INITIAL_POSITION_Y_2))
 
-		pygame.time.set_timer(pygame.USEREVENT + EVENT_MOVE_CREEPS, SECOND)
+		pygame.time.set_timer(pygame.USEREVENT + EVENT_MOVE_MECHANT, HALF_SECOND)
 		pygame.time.set_timer(pygame.USEREVENT + EVENT_BOMB_TIMEOUT, HALF_SECOND)
 		pygame.time.set_timer(pygame.USEREVENT + EVENT_FLAME_BURN, TWENTIETH_SECOND)
 		event_bomb_explose = [EVENT_BOMB_EXPLOSE_0, EVENT_BOMB_EXPLOSE_1, EVENT_BOMB_EXPLOSE_2, EVENT_BOMB_EXPLOSE_3, EVENT_BOMB_EXPLOSE_4, EVENT_BOMB_EXPLOSE_5, EVENT_BOMB_EXPLOSE_6, EVENT_BOMB_EXPLOSE_7, EVENT_BOMB_EXPLOSE_8, EVENT_BOMB_EXPLOSE_9]
 		event_bomb_explose_mechant = [EVENT_BOMB_EXPLOSE_0_2, EVENT_BOMB_EXPLOSE_1_2, EVENT_BOMB_EXPLOSE_2_2, EVENT_BOMB_EXPLOSE_3_2, EVENT_BOMB_EXPLOSE_4_2, EVENT_BOMB_EXPLOSE_5_2, EVENT_BOMB_EXPLOSE_6_2, EVENT_BOMB_EXPLOSE_7_2, EVENT_BOMB_EXPLOSE_8_2, EVENT_BOMB_EXPLOSE_9_2]
 		current_bomb_index = 0
+		current_bomb_index_mechant = 0
+		
 
 		# Main menu, pauses execution of the application
 		pause_menu = pygameMenu.Menu(window,
@@ -447,11 +449,20 @@ def adventure(user_name, sound_option):
 						pygame.time.set_timer(pygame.USEREVENT + event_bomb_explose[current_bomb_index], 3*HALF_SECOND)
 						current_bomb_index = (current_bomb_index + 1) % MAX_BOMB_AMOUNT
 			elif event.type >= pygame.NOEVENT and event.type <= pygame.NUMEVENTS:
-				#if event.type == pygame.USEREVENT + EVENT_MOVE_CREEPS:
-					#labyrinth.move_creeps()
-					#labyrinth.update_creeps_move_index()
+				if event.type == pygame.USEREVENT + EVENT_MOVE_MECHANT:
+					labyrinth.move_mechant(mechant)
+					mechant.update_move_index()
+					powerups_m = labyrinth.check_powerups(bomberman.get_position())
+					mechant.skill_up(powerups_m)
+
+					mechant.drop_bomb(labyrinth)
+					# 	labyrinth.drop_bomb(mechant.get_position())
+					# 	pygame.time.set_timer(pygame.USEREVENT + event_bomb_explose[current_bomb_index_mechant], 3*HALF_SECOND)
+					# 	current_bomb_index_mechant = (current_bomb_index_mechant + 1) % MAX_BOMB_AMOUNT
+					
 				if event.type == pygame.USEREVENT + EVENT_BOMB_TIMEOUT:
 					labyrinth.bomb_explose(bomberman.get_scope())
+					mechant.bombs_active(labyrinth)
 					#labyrinth.bomb_explose(mechant.get_scope())
 				if event.type == pygame.USEREVENT + EVENT_FLAME_BURN:
 					loop = not labyrinth.burn(bomberman.get_position())
@@ -461,6 +472,7 @@ def adventure(user_name, sound_option):
 					if event.type == pygame.USEREVENT + event_bomb_explose[k]:
 						pygame.time.set_timer(pygame.USEREVENT + event_bomb_explose[k], 0)
 						bomberman.bomb_explose()
+
 			labyrinth.print(window, size_unit, stage, username)
 			bomberman.print(window, size_unit)
 			if mechant.get_alive():
