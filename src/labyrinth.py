@@ -584,6 +584,11 @@ class Labyrinth:
 		"""
 		return self.grid[position.y][position.x] == Unit.PORTAL
 
+	def appear_portal(self, position):
+		""" Place un portal sur la position donnée en paramètre
+		"""
+		self.grid[position.y][position.x] = Unit.PORTAL		
+
 	def check_powerups(self, position):
 		""" Retourne un entier caractérisant le bonnus sur lequel le bomberman se trouve.
 			Paramètres:
