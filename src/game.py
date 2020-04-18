@@ -360,10 +360,7 @@ def adventure(user_name, sound_option):
 		pygame.time.set_timer(pygame.USEREVENT + EVENT_BOMB_TIMEOUT, HALF_SECOND)
 		pygame.time.set_timer(pygame.USEREVENT + EVENT_FLAME_BURN, TWENTIETH_SECOND)
 		event_bomb_explose = [EVENT_BOMB_EXPLOSE_0, EVENT_BOMB_EXPLOSE_1, EVENT_BOMB_EXPLOSE_2, EVENT_BOMB_EXPLOSE_3, EVENT_BOMB_EXPLOSE_4, EVENT_BOMB_EXPLOSE_5, EVENT_BOMB_EXPLOSE_6, EVENT_BOMB_EXPLOSE_7, EVENT_BOMB_EXPLOSE_8, EVENT_BOMB_EXPLOSE_9]
-		event_bomb_explose_mechant = [EVENT_BOMB_EXPLOSE_0_2, EVENT_BOMB_EXPLOSE_1_2, EVENT_BOMB_EXPLOSE_2_2, EVENT_BOMB_EXPLOSE_3_2, EVENT_BOMB_EXPLOSE_4_2, EVENT_BOMB_EXPLOSE_5_2, EVENT_BOMB_EXPLOSE_6_2, EVENT_BOMB_EXPLOSE_7_2, EVENT_BOMB_EXPLOSE_8_2, EVENT_BOMB_EXPLOSE_9_2]
-		current_bomb_index = 0
-		current_bomb_index_mechant = 0
-		
+		current_bomb_index = 0		
 
 		# Main menu, pauses execution of the application
 		pause_menu = pygameMenu.Menu(window,
@@ -455,10 +452,9 @@ def adventure(user_name, sound_option):
 					powerups_m = labyrinth.check_powerups(bomberman.get_position())
 					mechant.skill_up(powerups_m)
 
+					################################################""
+					#A changer, ici il pose automatiquement des bombes à chaque pas
 					mechant.drop_bomb(labyrinth)
-					# 	labyrinth.drop_bomb(mechant.get_position())
-					# 	pygame.time.set_timer(pygame.USEREVENT + event_bomb_explose[current_bomb_index_mechant], 3*HALF_SECOND)
-					# 	current_bomb_index_mechant = (current_bomb_index_mechant + 1) % MAX_BOMB_AMOUNT
 					
 				if event.type == pygame.USEREVENT + EVENT_BOMB_TIMEOUT:
 					labyrinth.bomb_explose(bomberman.get_scope())
@@ -502,8 +498,10 @@ def multiplayer(sound_option):
 
 	labyrinth = Labyrinth(multiplayer = True)
 	labyrinth.generate()
-	bomberman_1 = Bomberman()
-	bomberman_2 = Bomberman(Position(BOMBERMAN_INITIAL_POSITION_X_2, BOMBERMAN_INITIAL_POSITION_Y_2))
+	#bomberman_1 = Bomberman()
+	#bomberman_2 = Bomberman(Position(BOMBERMAN_INITIAL_POSITION_X_2, BOMBERMAN_INITIAL_POSITION_Y_2))
+	bomberman_1 = Mechant()
+	bomberman_2 = Mechant(Position(BOMBERMAN_INITIAL_POSITION_X_2, BOMBERMAN_INITIAL_POSITION_Y_2))
 
 	pygame.time.set_timer(pygame.USEREVENT + EVENT_BOMB_TIMEOUT, HALF_SECOND)
 	pygame.time.set_timer(pygame.USEREVENT + EVENT_FLAME_BURN, TWENTIETH_SECOND)
@@ -578,11 +576,12 @@ def multiplayer(sound_option):
 					bomberman_1.skill_up(powerups)
 					loop = not labyrinth.bomberman_on_portal(bomberman_1.get_position())
 			elif event.key == pygame.K_x:
-				if labyrinth.can_drop_bomb(bomberman_1.get_position()) and bomberman_1.can_drop_bomb():
-					bomberman_1.drop_bomb()
-					labyrinth.drop_bomb(bomberman_1.get_position())
-					pygame.time.set_timer(pygame.USEREVENT + event_bomb_explose[current_bomb_index], 3*HALF_SECOND)
-					current_bomb_index = (current_bomb_index + 1) % MAX_BOMB_AMOUNT
+				bomberman_1.drop_bomb(labyrinth)
+				# if labyrinth.can_drop_bomb(bomberman_1.get_position()) and bomberman_1.can_drop_bomb():
+				# 	bomberman_1.drop_bomb()
+				# 	labyrinth.drop_bomb(bomberman_1.get_position())
+				# 	pygame.time.set_timer(pygame.USEREVENT + event_bomb_explose[current_bomb_index], 3*HALF_SECOND)
+				# 	current_bomb_index = (current_bomb_index + 1) % MAX_BOMB_AMOUNT
 			elif event.key == pygame.K_l:
 				bomberman_2.turn(Direction.RIGHT)
 				bomberman_2.update_move_index()
@@ -616,18 +615,25 @@ def multiplayer(sound_option):
 					bomberman_2.skill_up(powerups)
 					loop = not labyrinth.bomberman_on_portal(bomberman_2.get_position())
 			elif event.key == pygame.K_m:
-				if labyrinth.can_drop_bomb(bomberman_2.get_position()) and bomberman_2.can_drop_bomb():
-					bomberman_2.drop_bomb()
-					labyrinth.drop_bomb(bomberman_2.get_position())
-					pygame.time.set_timer(pygame.USEREVENT + event_bomb_explose_2[current_bomb_index_2], 3*HALF_SECOND)
-					current_bomb_index_2 = (current_bomb_index_2 + 1) % MAX_BOMB_AMOUNT
+				bomberman_2.drop_bomb(labyrinth)
+				# if labyrinth.can_drop_bomb(bomberman_2.get_position()) and bomberman_2.can_drop_bomb():
+				# 	bomberman_2.drop_bomb()
+				# 	labyrinth.drop_bomb(bomberman_2.get_position())
+				# 	pygame.time.set_timer(pygame.USEREVENT + event_bomb_explose_2[current_bomb_index_2], 3*HALF_SECOND)
+				# 	current_bomb_index_2 = (current_bomb_index_2 + 1) % MAX_BOMB_AMOUNT
+
 		elif event.type >= pygame.NOEVENT and event.type <= pygame.NUMEVENTS:
 			if event.type == pygame.USEREVENT + EVENT_BOMB_TIMEOUT:
-				labyrinth.bomb_explose(bomberman_1.get_scope())
+				#labyrinth.bomb_explose(bomberman_1.get_scope())
 				# labyrinth.bomb_explose(bomberman_2.get_scope())
+				bomberman_1.bombs_active(labyrinth)
+				bomberman_2.bombs_active(labyrinth)
+
 			if event.type == pygame.USEREVENT + EVENT_FLAME_BURN:
 				loop = not labyrinth.burn(bomberman_1.get_position())
-				loop = not labyrinth.burn(bomberman_2.get_position())
+				if loop:
+					loop = not labyrinth.burn(bomberman_2.get_position())
+
 			for k in range(0, MAX_BOMB_AMOUNT):
 				if event.type == pygame.USEREVENT + event_bomb_explose[k]:
 					pygame.time.set_timer(pygame.USEREVENT + event_bomb_explose[k], 0)
@@ -636,6 +642,7 @@ def multiplayer(sound_option):
 				if event.type == pygame.USEREVENT + event_bomb_explose_2[k]:
 					pygame.time.set_timer(pygame.USEREVENT + event_bomb_explose_2[k], 0)
 					bomberman_2.bomb_explose()
+
 		labyrinth.print(window, size_unit)
 		bomberman_1.print(window, size_unit)
 		bomberman_2.print(window, size_unit)

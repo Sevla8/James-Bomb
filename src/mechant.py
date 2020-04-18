@@ -47,6 +47,4 @@ class Mechant(Bomberman):
         if  self.alive and labyrinth.can_drop_bomb(self.position) and self.can_drop_bomb():
             bomb = self.bombs[self.skill.droped_bomb_amount]        
             bomb.droped(self.position,labyrinth)
-            #print("OUI")
             return
-        #print("NON")

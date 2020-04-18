@@ -52,7 +52,8 @@ class Bomb:
             labyrinth.grid[self.position.y][self.position.x] = Unit.BOMB_3
         elif labyrinth.grid[self.position.y][self.position.x] == Unit.BOMB_3:
             labyrinth.grid[self.position.y][self.position.x] = Unit.FLAME_0
-            for k in range(j, max(Y_MIN, j-self.holder.skill.scope-1), -1):
+            self.set_active(False)
+            for k in range(self.position.y, max(Y_MIN, self.position.y-self.holder.skill.scope-1), -1):
                 if labyrinth.grid[k][self.position.x] == Unit.GROUND:
                     labyrinth.grid[k][self.position.x] = Unit.FLAME_0
                 if labyrinth.grid[k][self.position.x] == Unit.PORTAL:
@@ -82,7 +83,7 @@ class Bomb:
                     bomb = Bomb.find_bomb(Position(self.position.x,k))
                     self.bomb_explose(bomb)
                     break
-            for k in range(j, min(Y_MAX, j+self.holder.skill.scope+1), 1):
+            for k in range(self.position.y, min(Y_MAX, self.position.y+self.holder.skill.scope+1), 1):
                 if labyrinth.grid[k][self.position.x] == Unit.GROUND:
                     labyrinth.grid[k][self.position.x] = Unit.FLAME_0
                 if labyrinth.grid[k][self.position.x] == Unit.PORTAL:
@@ -112,7 +113,7 @@ class Bomb:
                     bomb = Bomb.find_bomb(Position(self.position.x,k))
                     self.bomb_explose(bomb)
                     break
-            for k in range(i, max(X_MIN, i-self.holder.skill.scope-1), -1):
+            for k in range(self.position.x, max(X_MIN, self.position.x-self.holder.skill.scope-1), -1):
                 if labyrinth.grid[self.position.y][k] == Unit.GROUND:
                     labyrinth.grid[self.position.y][k] = Unit.FLAME_0
                 if labyrinth.grid[self.position.y][k] == Unit.PORTAL:
@@ -142,7 +143,7 @@ class Bomb:
                     bomb = Bomb.find_bomb(Position(k,self.position.y))
                     self.bomb_explose(bomb)
                     break
-            for k in range(i, min(X_MAX, i+self.holder.skill.scope+1), 1):
+            for k in range(self.position.x, min(X_MAX, self.position.x+self.holder.skill.scope+1), 1):
                 if labyrinth.grid[self.position.y][k] == Unit.GROUND:
                     labyrinth.grid[self.position.y][k] = Unit.FLAME_0
                 if labyrinth.grid[self.position.y][k] == Unit.PORTAL:
@@ -172,4 +173,3 @@ class Bomb:
                     bomb = Bomb.find_bomb(Position(k,self.position.y))
                     self.bomb_explose(bomb)
                     break
-        self.set_active(False)
