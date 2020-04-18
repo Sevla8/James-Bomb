@@ -99,7 +99,8 @@ def principal_menu() :
 	play_menu.add_option('Battle', launch_battle)
 	play_menu.add_option('Adventure', launch_adventure)
 	play_menu.add_option('Multiplayer', launch_multiplayer)
-	play_menu.add_button('Back', pygameMenu.events.BACK)
+	#play_menu.add_button('Back', pygameMenu.events.BACK)
+	play_menu.add_option('Back', pygameMenu.events.BACK)
 
 	option_menu = pygameMenu.Menu(surface,
 								  back_box=False,
@@ -134,7 +135,8 @@ def principal_menu() :
 	option_menu.add_selector('Sound : ',
 							 [('On', True), ('Off', False)],
 							 onchange=update_sound)
-	option_menu.add_button('Back', pygameMenu.events.BACK)
+	#option_menu.add_button('Back', pygameMenu.events.BACK)
+	option_menu.add_option('Back', pygameMenu.events.BACK)
 
 	help_menu = pygameMenu.TextMenu(surface,
 								back_box=False,
@@ -165,7 +167,8 @@ def principal_menu() :
 	help_menu.add_line(pygameMenu.locals.TEXT_NEWLINE)
 	help_menu.add_line('Space : Drop Bomb')
 	help_menu.add_line('Escape : Pause Menu')
-	help_menu.add_button('Back', pygameMenu.events.BACK)
+	#help_menu.add_button('Back', pygameMenu.events.BACK)
+	help_menu.add_option('Back', pygameMenu.events.BACK)
 
 	main_menu = pygameMenu.Menu(surface,
 								back_box=False,
