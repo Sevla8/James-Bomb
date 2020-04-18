@@ -343,7 +343,7 @@ def adventure(user_name, sound_option):
 					if event.type == pygame.USEREVENT + event_bomb_explose[k]:
 						pygame.time.set_timer(pygame.USEREVENT + event_bomb_explose[k], 0)
 						bomberman.bomb_explose()
-			labyrinth.print(window, size_unit)
+			labyrinth.print(window, size_unit, stage, username)
 			bomberman.print(window, size_unit)
 			pause_menu.mainloop(event, disable_loop=False)
 			pygame.display.flip()

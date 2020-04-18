@@ -601,7 +601,7 @@ class Labyrinth:
 			self.grid[position.y][position.x] = Unit.GROUND
 			return FLAME_UP
 
-	def print(self, window, size_unit):
+	def print(self, window, size_unit, stage = -1, username = None):
 		""" Affiche le labyrinthe dans la fenêtre caractérisé par 'window'.
 			Paramètres:
 				'window':
@@ -658,3 +658,9 @@ class Labyrinth:
 					window.blit(pygame.transform.scale(self.powerups[1], (size_unit, size_unit)), (i*size_unit, j*size_unit))
 		for creep in self.creeps:
 			creep.print(window, size_unit)
+		if stage != -1:
+			font = pygame.font.Font('freesansbold.ttf', 32)
+			text = font.render(username+' | '+'Stage '+str(stage), True, (255, 255, 255))
+			textRect = text.get_rect()
+			textRect.topleft = (0, 0)
+			window.blit(text, textRect)
