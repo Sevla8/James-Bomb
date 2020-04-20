@@ -349,12 +349,13 @@ def adventure(user_name, sound_option):
 			pause_menu.mainloop(event, disable_loop=False)
 			pygame.display.flip()
 
-# Affrontement contre le méchant
+# Affrontement contre le boss
 	else :
 		labyrinth = Labyrinth(True)
 		labyrinth.generate()
-		bomberman = Bomberman()
-		boss = Boss(Position(BOMBERMAN_INITIAL_POSITION_X_2, BOMBERMAN_INITIAL_POSITION_Y_2))
+		#bomberman = Bomberman()
+		bomberman = Boss()
+		boss = Boss(True, Position(BOMBERMAN_INITIAL_POSITION_X_2, BOMBERMAN_INITIAL_POSITION_Y_2))
 
 		pygame.time.set_timer(pygame.USEREVENT + EVENT_MOVE_BOSS, HALF_SECOND)
 		pygame.time.set_timer(pygame.USEREVENT + EVENT_BOMB_TIMEOUT, HALF_SECOND)
@@ -440,11 +441,12 @@ def adventure(user_name, sound_option):
 							stage += 1
 							#save_progression(username, stage)
 				elif event.key == pygame.K_SPACE:
-					if labyrinth.can_drop_bomb(bomberman.get_position()) and bomberman.can_drop_bomb():
-						bomberman.drop_bomb()
-						labyrinth.drop_bomb(bomberman.get_position())
-						pygame.time.set_timer(pygame.USEREVENT + event_bomb_explose[current_bomb_index], 3*HALF_SECOND)
-						current_bomb_index = (current_bomb_index + 1) % MAX_BOMB_AMOUNT
+					bomberman.drop_bomb(labyrinth)
+					# if labyrinth.can_drop_bomb(bomberman.get_position()) and bomberman.can_drop_bomb():
+					# 	bomberman.drop_bomb()
+					# 	labyrinth.drop_bomb(bomberman.get_position())
+					# 	pygame.time.set_timer(pygame.USEREVENT + event_bomb_explose[current_bomb_index], 3*HALF_SECOND)
+					# 	current_bomb_index = (current_bomb_index + 1) % MAX_BOMB_AMOUNT
 			elif event.type >= pygame.NOEVENT and event.type <= pygame.NUMEVENTS:
 				if event.type == pygame.USEREVENT + EVENT_MOVE_BOSS:
 					labyrinth.move_boss(boss)
@@ -457,7 +459,8 @@ def adventure(user_name, sound_option):
 					boss.drop_bomb(labyrinth)
 					
 				if event.type == pygame.USEREVENT + EVENT_BOMB_TIMEOUT:
-					labyrinth.bomb_explose(bomberman.get_scope())
+					#labyrinth.bomb_explose(bomberman.get_scope())
+					bomberman.bombs_active(labyrinth)
 					boss.bombs_active(labyrinth)
 					#labyrinth.bomb_explose(boss.get_scope())
 				if event.type == pygame.USEREVENT + EVENT_FLAME_BURN:
@@ -501,7 +504,7 @@ def multiplayer(sound_option):
 	#bomberman_1 = Bomberman()
 	#bomberman_2 = Bomberman(Position(BOMBERMAN_INITIAL_POSITION_X_2, BOMBERMAN_INITIAL_POSITION_Y_2))
 	bomberman_1 = Boss()
-	bomberman_2 = Boss(Position(BOMBERMAN_INITIAL_POSITION_X_2, BOMBERMAN_INITIAL_POSITION_Y_2))
+	bomberman_2 = Boss(True,Position(BOMBERMAN_INITIAL_POSITION_X_2, BOMBERMAN_INITIAL_POSITION_Y_2))
 
 	pygame.time.set_timer(pygame.USEREVENT + EVENT_BOMB_TIMEOUT, HALF_SECOND)
 	pygame.time.set_timer(pygame.USEREVENT + EVENT_FLAME_BURN, TWENTIETH_SECOND)

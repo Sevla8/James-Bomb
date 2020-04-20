@@ -15,10 +15,11 @@ import random
 
 class Boss(Bomberman):
     
-    def __init__(self, initial_position = Position(BOMBERMAN_INITIAL_POSITION_X, BOMBERMAN_INITIAL_POSITION_Y)):
+    def __init__(self, change_direction = False , initial_position = Position(BOMBERMAN_INITIAL_POSITION_X, BOMBERMAN_INITIAL_POSITION_Y)):
         super(Boss, self).__init__(initial_position)
         self.alive = True
-        self.direction = Direction.UP
+        if change_direction :
+            self.direction = Direction.UP
         self.bombs = [Bomb(self)] * MAXIMAL_BOMB_AMOUNT
 
     def touched(self,labyrinth):
