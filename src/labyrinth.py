@@ -246,28 +246,28 @@ class Labyrinth:
 						elif self.grid[creep.position.y][creep.position.x] == Unit.FLAME_POWERUP:
 							self.grid[creep.position.y][creep.position.x] = Unit.GROUND
 
-	def move_mechant(self, mechant):
-		if not mechant.get_alive:
+	def move_boss(self, boss):
+		if not boss.get_alive:
 			return
 			
-		if self.valid_move(mechant.position, mechant.direction):
-			mechant.move(mechant.direction)
-			if self.grid[mechant.position.y][mechant.position.x] == Unit.BOMB_POWERUP:
-				self.grid[mechant.position.y][mechant.position.x] = Unit.GROUND
-			elif self.grid[mechant.position.y][mechant.position.x] == Unit.FLAME_POWERUP:
-				self.grid[mechant.position.y][mechant.position.x] = Unit.GROUND
+		if self.valid_move(boss.position, boss.direction):
+			boss.move(boss.direction)
+			if self.grid[boss.position.y][boss.position.x] == Unit.BOMB_POWERUP:
+				self.grid[boss.position.y][boss.position.x] = Unit.GROUND
+			elif self.grid[boss.position.y][boss.position.x] == Unit.FLAME_POWERUP:
+				self.grid[boss.position.y][boss.position.x] = Unit.GROUND
         # sinon on cherche une autre direction au hasard
 		else:
 			dead_end = False
-			if self.grid[mechant.position.y+1][mechant.position.x] <= Unit.PORTAL and self.grid[mechant.position.y-1][mechant.position.x] <= Unit.PORTAL and self.grid[mechant.position.y][mechant.position.x+1] <= Unit.PORTAL and self.grid[mechant.position.y][mechant.position.x-1] <= Unit.PORTAL:
+			if self.grid[boss.position.y+1][boss.position.x] <= Unit.PORTAL and self.grid[boss.position.y-1][boss.position.x] <= Unit.PORTAL and self.grid[boss.position.y][boss.position.x+1] <= Unit.PORTAL and self.grid[boss.position.y][boss.position.x-1] <= Unit.PORTAL:
 				dead_end = True
 			if not dead_end:
 				next_direction = random.choice([Direction.UP, Direction.LEFT, Direction.RIGHT, Direction.DOWN])
-				while not self.valid_move(mechant.position, next_direction):
+				while not self.valid_move(boss.position, next_direction):
 					next_direction = random.choice([Direction.UP, Direction.LEFT, Direction.RIGHT, Direction.DOWN])
                 # si collision le creep ne fait que se tourner
-				mechant.turn(next_direction)
-				mechant.move(next_direction)
+				boss.turn(next_direction)
+				boss.move(next_direction)
 
 	
 
