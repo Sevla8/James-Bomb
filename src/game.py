@@ -234,6 +234,27 @@ def adventure(user_name, sound_option):
 	stage = load_progression(username)
 	if stage == 0:
 		# afficher cinématique
+		font = pygame.font.Font('freesansbold.ttf', 32)
+		text = font.render("press SPACE to continue", True, (0, 0, 0))
+		textRect = text.get_rect()
+		textRect.topleft = (0, 0)
+		window.blit(pygame.transform.scale(STORY_1[0],(WINDOW_SIZE[1],WINDOW_SIZE[0])),(0,0))
+		window.blit(text, textRect)
+		pygame.display.flip()
+		cmp_story = 0
+		while True:
+			event = pygame.event.wait()
+			if event.type == pygame.QUIT:
+				exit()
+			elif event.type == pygame.KEYDOWN:
+				if event.key == pygame.K_SPACE:
+					cmp_story += 1
+					if cmp_story == 10:
+						break
+					window.blit(pygame.transform.scale(STORY_1[cmp_story],(WINDOW_SIZE[1],WINDOW_SIZE[0])),(0,0))
+					window.blit(text, textRect)
+					pygame.display.flip()
+
 		stage += 1
 		new_progression(username, stage)
 

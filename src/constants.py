@@ -1,5 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
+import pygame
 
 DEFAULT_SIZE_UNIT = 40
 WINDOW_SIZE = (DEFAULT_SIZE_UNIT*15, DEFAULT_SIZE_UNIT*15)
@@ -80,6 +81,17 @@ UNIT_BOX = "sprites/Blocks/ExplodableBlock.png"
 UNIT_PORTAL = "sprites/Blocks/Portal.png"
 BOMB_POWERUP = "sprites/Powerups/BombPowerup.png"
 FLAME_POWERUP = "sprites/Powerups/FlamePowerup.png"
+STORY_1_1 = "sprites/Story/story1.1.jpg"
+STORY_1_2 = "sprites/Story/story1.2.jpg"
+STORY_1_3 = "sprites/Story/story1.3.jpg"
+STORY_1_4 = "sprites/Story/story1.4.jpg"
+STORY_1_5 = "sprites/Story/story1.5.jpg"
+STORY_1_6 = "sprites/Story/story1.6.jpg"
+STORY_1_7 = "sprites/Story/story1.7.jpg"
+STORY_1_8 = "sprites/Story/story1.8.jpg"
+STORY_1_9 = "sprites/Story/story1.9.jpg"
+STORY_1_10 = "sprites/Story/story1.10.jpg"
+STORY_1 = [pygame.image.load(STORY_1_1),pygame.image.load(STORY_1_2),pygame.image.load(STORY_1_3),pygame.image.load(STORY_1_4),pygame.image.load(STORY_1_5),pygame.image.load(STORY_1_6),pygame.image.load(STORY_1_7),pygame.image.load(STORY_1_8),pygame.image.load(STORY_1_9),pygame.image.load(STORY_1_10)]
 X_MIN = 0
 X_MAX = 15
 Y_MIN = 0
